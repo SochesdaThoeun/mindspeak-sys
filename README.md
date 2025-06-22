@@ -1,7 +1,7 @@
 # MindSpeak 🧠💭
 
 
-FULL URL: https://mindspeak-sys.vercel.app/auth/login
+FULL URL: https://www.mindspeak.xyz
 
 
 
