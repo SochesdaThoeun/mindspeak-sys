@@ -12,7 +12,7 @@ import logo from "@/assets/logo9.png";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // Redux imports
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useAuth } from "@/store/hooks";
 import { loginUser, registerUser, clearError } from "@/store/slices/authSlice";
 import { LoginPayload, RegisterPayload } from "@/store/types/auth";
@@ -45,12 +45,12 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
     isAnonymous: false,
   });
 
-  // Clear errors when switching between login/signup
+  // Clear errors when switching between login/signup (but not on initial load)
   useEffect(() => {
     if (error) {
       dispatch(clearError());
     }
-  }, [isLogin, dispatch, error]);
+  }, [isLogin, dispatch]); // Removed 'error' from dependencies to prevent clearing on error updates
 
   // Redirect if user is already authenticated
   useEffect(() => {
@@ -83,9 +83,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
       setIsLogin(!isLogin);
       setShowPassword(false);
       // Clear errors when switching modes
-      if (error) {
-        dispatch(clearError());
-      }
+      dispatch(clearError());
       setTimeout(() => setIsAnimating(false), 50);
     }, 150);
   };
@@ -341,14 +339,46 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     </button>
                   </p>
                   
-                  {/* Error Display */}
+                  {/* Error Display Banner */}
                   {error && (
-                    <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <p className="text-red-400 text-sm font-medium">
-                        {error}
-                      </p>
+                    <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg backdrop-blur-sm">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0">
+                          <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {Array.isArray(error) ? (
+                            error.length === 1 ? (
+                              <p className="text-red-400 text-sm font-medium">
+                                {error[0]}
+                              </p>
+                            ) : (
+                              <div className="space-y-1">
+                                <p className="text-red-400 text-sm font-semibold mb-2">
+                                  Please fix the following errors:
+                                </p>
+                                <ul className="space-y-1">
+                                  {error.map((errorMessage, index) => (
+                                    <li key={index} className="text-red-400 text-sm flex items-start">
+                                      <span className="mr-2 mt-1.5 w-1 h-1 bg-red-400 rounded-full flex-shrink-0"></span>
+                                      {errorMessage}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )
+                          ) : (
+                            <p className="text-red-400 text-sm font-medium">
+                              {String(error)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
+
                 </div>
 
                 {/* Forms */}

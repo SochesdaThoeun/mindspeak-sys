@@ -14,13 +14,46 @@ interface ApiError {
     data?: {
       message?: string;
       errors?: Record<string, string[]>;
+      error?: {
+        message?: string;  
+        errors?: Record<string, string[]>;
+      };
     };
     status?: number;
   };
   message?: string;
 }
 
-// Initial state
+// Helper function to extract all error messages from API response
+const extractErrorMessages = (apiError: ApiError): string[] => {
+  const messages: string[] = [];
+  
+  // Check for nested error structure first
+  const errorData = apiError.response?.data?.error || apiError.response?.data;
+  
+  if (errorData?.errors) {
+    // Extract all validation errors
+    Object.values(errorData.errors).forEach(errorArray => {
+      if (Array.isArray(errorArray)) {
+        messages.push(...errorArray);
+      }
+    });
+  }
+  
+  // Only add main message if no validation errors were found
+  if (messages.length === 0 && errorData?.message) {
+    messages.push(errorData.message);
+  }
+  
+  // Fallback to generic API error message
+  if (messages.length === 0 && apiError.message) {
+    messages.push(apiError.message);
+  }
+  
+  return messages.length > 0 ? messages : ['An unexpected error occurred'];
+};
+
+// Initial state with updated error type
 const initialState: AuthState = {
   user: null,
   token: null,
@@ -44,7 +77,7 @@ export const checkAuthStatus = createAsyncThunk(
     } catch (error: unknown) {
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Auth status check failed', apiError.message)
-      return rejectWithValue({ message: 'Failed to check authentication status' })
+      return rejectWithValue({ errors: ['Failed to check authentication status'] })
     }
   }
 )
@@ -61,18 +94,9 @@ export const registerUser = createAsyncThunk(
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Registration failed', apiError.response?.data || apiError.message)
       
-      // Extract specific error message from API response
-      const errorData = apiError.response?.data
-      if (errorData?.errors) {
-        // Get the first error from the errors object
-        const firstErrorKey = Object.keys(errorData.errors)[0]
-        const firstErrorMessage = errorData.errors[firstErrorKey]?.[0]
-        if (firstErrorMessage) {
-          return rejectWithValue({ message: firstErrorMessage })
-        }
-      }
-      
-      return rejectWithValue(errorData || { message: 'Registration failed' })
+      // Extract all error messages from API response
+      const errorMessages = extractErrorMessages(apiError)
+      return rejectWithValue({ errors: errorMessages })
     }
   }
 )
@@ -88,18 +112,9 @@ export const loginUser = createAsyncThunk(
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Login failed', apiError.response?.data || apiError.message)
       
-      // Extract specific error message from API response
-      const errorData = apiError.response?.data
-      if (errorData?.errors) {
-        // Get the first error from the errors object
-        const firstErrorKey = Object.keys(errorData.errors)[0]
-        const firstErrorMessage = errorData.errors[firstErrorKey]?.[0]
-        if (firstErrorMessage) {
-          return rejectWithValue({ message: firstErrorMessage })
-        }
-      }
-      
-      return rejectWithValue(errorData || { message: 'Login failed' })
+      // Extract all error messages from API response
+      const errorMessages = extractErrorMessages(apiError)
+      return rejectWithValue({ errors: errorMessages })
     }
   }
 )
@@ -130,7 +145,8 @@ export const getUserProfile = createAsyncThunk(
     } catch (error: unknown) {
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Get profile failed', apiError.response?.data || apiError.message)
-      return rejectWithValue(apiError.response?.data || { message: 'Failed to fetch profile' })
+      const errorMessages = extractErrorMessages(apiError)
+      return rejectWithValue({ errors: errorMessages })
     }
   }
 )
@@ -145,13 +161,14 @@ export const updateUserProfile = createAsyncThunk(
     } catch (error: unknown) {
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Update profile failed', apiError.response?.data || apiError.message)
-      return rejectWithValue(apiError.response?.data || { message: 'Failed to update profile' })
+      const errorMessages = extractErrorMessages(apiError)
+      return rejectWithValue({ errors: errorMessages })
     }
   }
 )
 
 export const refreshUserData = createAsyncThunk(
-  'auth/refreshUserData',
+  'auth/refreshUserData',  
   async (_, { rejectWithValue }) => {
     try {
       console.log('📤 Auth Slice: Refreshing user data')
@@ -163,7 +180,7 @@ export const refreshUserData = createAsyncThunk(
     } catch (error: unknown) {
       const apiError = error as ApiError
       console.error('❌ Auth Slice: Refresh user data failed', apiError.message)
-      return rejectWithValue({ message: 'Failed to refresh user data' })
+      return rejectWithValue({ errors: ['Failed to refresh user data'] })
     }
   }
 )
@@ -222,8 +239,8 @@ const authSlice = createSlice({
         state.isLoading = false
         state.user = null
         state.isAuthenticated = false
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Auth status check failed';
+        const payload = action.payload as { message?: string; errors?: string[] } | undefined;
+        state.error = payload?.errors || [payload?.message || 'Auth status check failed'];
         console.log('❌ Auth Slice: Auth status check rejected', state.error)
       })
 
@@ -247,8 +264,8 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Registration failed';
+        const payload = action.payload as { errors?: string[] } | undefined;
+        state.error = payload?.errors || ['Registration failed'];
         console.log('❌ Auth Slice: Registration rejected', state.error)
       })
 
@@ -272,8 +289,8 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Login failed';
+        const payload = action.payload as { errors?: string[] } | undefined;
+        state.error = payload?.errors || ['Login failed'];
         console.log('❌ Auth Slice: Login rejected', state.error)
       })
 
@@ -317,8 +334,8 @@ const authSlice = createSlice({
       })
       .addCase(getUserProfile.rejected, (state, action) => {
         state.isLoading = false
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Failed to fetch profile';
+        const payload = action.payload as { message?: string; errors?: string[] } | undefined;
+        state.error = payload?.errors || [payload?.message || 'Failed to fetch profile'];
         console.log('❌ Auth Slice: Get profile rejected', state.error)
       })
 
@@ -338,8 +355,8 @@ const authSlice = createSlice({
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.isLoading = false
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Failed to update profile';
+        const payload = action.payload as { message?: string; errors?: string[] } | undefined;
+        state.error = payload?.errors || [payload?.message || 'Failed to update profile'];
         console.log('❌ Auth Slice: Update profile rejected', state.error)
       })
 
@@ -356,8 +373,8 @@ const authSlice = createSlice({
         })
       })
       .addCase(refreshUserData.rejected, (state, action) => {
-        const payload = action.payload as { message?: string } | undefined;
-        state.error = payload?.message || 'Failed to refresh user data';
+        const payload = action.payload as { message?: string; errors?: string[] } | undefined;
+        state.error = payload?.errors || [payload?.message || 'Failed to refresh user data'];
         console.log('❌ Auth Slice: Refresh user data rejected', state.error)
       })
   }

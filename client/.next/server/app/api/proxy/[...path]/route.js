@@ -1,0 +1,122 @@
+/*
+ * ATTENTION: An "eval-source-map" devtool has been used.
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+(() => {
+var exports = {};
+exports.id = "app/api/proxy/[...path]/route";
+exports.ids = ["app/api/proxy/[...path]/route"];
+exports.modules = {
+
+/***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&page=%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproxy%2F%5B...path%5D%2Froute.ts&appDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&page=%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproxy%2F%5B...path%5D%2Froute.ts&appDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D! ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   patchFetch: () => (/* binding */ patchFetch),\n/* harmony export */   routeModule: () => (/* binding */ routeModule),\n/* harmony export */   serverHooks: () => (/* binding */ serverHooks),\n/* harmony export */   workAsyncStorage: () => (/* binding */ workAsyncStorage),\n/* harmony export */   workUnitAsyncStorage: () => (/* binding */ workUnitAsyncStorage)\n/* harmony export */ });\n/* harmony import */ var next_dist_server_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/dist/server/route-modules/app-route/module.compiled */ \"(rsc)/./node_modules/next/dist/server/route-modules/app-route/module.compiled.js\");\n/* harmony import */ var next_dist_server_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_dist_server_route_kind__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! next/dist/server/route-kind */ \"(rsc)/./node_modules/next/dist/server/route-kind.js\");\n/* harmony import */ var next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! next/dist/server/lib/patch-fetch */ \"(rsc)/./node_modules/next/dist/server/lib/patch-fetch.js\");\n/* harmony import */ var next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _Users_scd_Documents_GitHub_mindspeak_sys_client_src_app_api_proxy_path_route_ts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./src/app/api/proxy/[...path]/route.ts */ \"(rsc)/./src/app/api/proxy/[...path]/route.ts\");\n\n\n\n\n// We inject the nextConfigOutput here so that we can use them in the route\n// module.\nconst nextConfigOutput = \"\"\nconst routeModule = new next_dist_server_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__.AppRouteRouteModule({\n    definition: {\n        kind: next_dist_server_route_kind__WEBPACK_IMPORTED_MODULE_1__.RouteKind.APP_ROUTE,\n        page: \"/api/proxy/[...path]/route\",\n        pathname: \"/api/proxy/[...path]\",\n        filename: \"route\",\n        bundlePath: \"app/api/proxy/[...path]/route\"\n    },\n    resolvedPagePath: \"/Users/scd/Documents/GitHub/mindspeak-sys/client/src/app/api/proxy/[...path]/route.ts\",\n    nextConfigOutput,\n    userland: _Users_scd_Documents_GitHub_mindspeak_sys_client_src_app_api_proxy_path_route_ts__WEBPACK_IMPORTED_MODULE_3__\n});\n// Pull out the exports that we need to expose from the module. This should\n// be eliminated when we've moved the other routes to the new format. These\n// are used to hook into the route.\nconst { workAsyncStorage, workUnitAsyncStorage, serverHooks } = routeModule;\nfunction patchFetch() {\n    return (0,next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__.patchFetch)({\n        workAsyncStorage,\n        workUnitAsyncStorage\n    });\n}\n\n\n//# sourceMappingURL=app-route.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2J1aWxkL3dlYnBhY2svbG9hZGVycy9uZXh0LWFwcC1sb2FkZXIvaW5kZXguanM/bmFtZT1hcHAlMkZhcGklMkZwcm94eSUyRiU1Qi4uLnBhdGglNUQlMkZyb3V0ZSZwYWdlPSUyRmFwaSUyRnByb3h5JTJGJTVCLi4ucGF0aCU1RCUyRnJvdXRlJmFwcFBhdGhzPSZwYWdlUGF0aD1wcml2YXRlLW5leHQtYXBwLWRpciUyRmFwaSUyRnByb3h5JTJGJTVCLi4ucGF0aCU1RCUyRnJvdXRlLnRzJmFwcERpcj0lMkZVc2VycyUyRnNjZCUyRkRvY3VtZW50cyUyRkdpdEh1YiUyRm1pbmRzcGVhay1zeXMlMkZjbGllbnQlMkZzcmMlMkZhcHAmcGFnZUV4dGVuc2lvbnM9dHN4JnBhZ2VFeHRlbnNpb25zPXRzJnBhZ2VFeHRlbnNpb25zPWpzeCZwYWdlRXh0ZW5zaW9ucz1qcyZyb290RGlyPSUyRlVzZXJzJTJGc2NkJTJGRG9jdW1lbnRzJTJGR2l0SHViJTJGbWluZHNwZWFrLXN5cyUyRmNsaWVudCZpc0Rldj10cnVlJnRzY29uZmlnUGF0aD10c2NvbmZpZy5qc29uJmJhc2VQYXRoPSZhc3NldFByZWZpeD0mbmV4dENvbmZpZ091dHB1dD0mcHJlZmVycmVkUmVnaW9uPSZtaWRkbGV3YXJlQ29uZmlnPWUzMCUzRCEiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7QUFBK0Y7QUFDdkM7QUFDcUI7QUFDcUM7QUFDbEg7QUFDQTtBQUNBO0FBQ0Esd0JBQXdCLHlHQUFtQjtBQUMzQztBQUNBLGNBQWMsa0VBQVM7QUFDdkI7QUFDQTtBQUNBO0FBQ0E7QUFDQSxLQUFLO0FBQ0w7QUFDQTtBQUNBLFlBQVk7QUFDWixDQUFDO0FBQ0Q7QUFDQTtBQUNBO0FBQ0EsUUFBUSxzREFBc0Q7QUFDOUQ7QUFDQSxXQUFXLDRFQUFXO0FBQ3RCO0FBQ0E7QUFDQSxLQUFLO0FBQ0w7QUFDMEY7O0FBRTFGIiwic291cmNlcyI6WyIiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQXBwUm91dGVSb3V0ZU1vZHVsZSB9IGZyb20gXCJuZXh0L2Rpc3Qvc2VydmVyL3JvdXRlLW1vZHVsZXMvYXBwLXJvdXRlL21vZHVsZS5jb21waWxlZFwiO1xuaW1wb3J0IHsgUm91dGVLaW5kIH0gZnJvbSBcIm5leHQvZGlzdC9zZXJ2ZXIvcm91dGUta2luZFwiO1xuaW1wb3J0IHsgcGF0Y2hGZXRjaCBhcyBfcGF0Y2hGZXRjaCB9IGZyb20gXCJuZXh0L2Rpc3Qvc2VydmVyL2xpYi9wYXRjaC1mZXRjaFwiO1xuaW1wb3J0ICogYXMgdXNlcmxhbmQgZnJvbSBcIi9Vc2Vycy9zY2QvRG9jdW1lbnRzL0dpdEh1Yi9taW5kc3BlYWstc3lzL2NsaWVudC9zcmMvYXBwL2FwaS9wcm94eS9bLi4ucGF0aF0vcm91dGUudHNcIjtcbi8vIFdlIGluamVjdCB0aGUgbmV4dENvbmZpZ091dHB1dCBoZXJlIHNvIHRoYXQgd2UgY2FuIHVzZSB0aGVtIGluIHRoZSByb3V0ZVxuLy8gbW9kdWxlLlxuY29uc3QgbmV4dENvbmZpZ091dHB1dCA9IFwiXCJcbmNvbnN0IHJvdXRlTW9kdWxlID0gbmV3IEFwcFJvdXRlUm91dGVNb2R1bGUoe1xuICAgIGRlZmluaXRpb246IHtcbiAgICAgICAga2luZDogUm91dGVLaW5kLkFQUF9ST1VURSxcbiAgICAgICAgcGFnZTogXCIvYXBpL3Byb3h5L1suLi5wYXRoXS9yb3V0ZVwiLFxuICAgICAgICBwYXRobmFtZTogXCIvYXBpL3Byb3h5L1suLi5wYXRoXVwiLFxuICAgICAgICBmaWxlbmFtZTogXCJyb3V0ZVwiLFxuICAgICAgICBidW5kbGVQYXRoOiBcImFwcC9hcGkvcHJveHkvWy4uLnBhdGhdL3JvdXRlXCJcbiAgICB9LFxuICAgIHJlc29sdmVkUGFnZVBhdGg6IFwiL1VzZXJzL3NjZC9Eb2N1bWVudHMvR2l0SHViL21pbmRzcGVhay1zeXMvY2xpZW50L3NyYy9hcHAvYXBpL3Byb3h5L1suLi5wYXRoXS9yb3V0ZS50c1wiLFxuICAgIG5leHRDb25maWdPdXRwdXQsXG4gICAgdXNlcmxhbmRcbn0pO1xuLy8gUHVsbCBvdXQgdGhlIGV4cG9ydHMgdGhhdCB3ZSBuZWVkIHRvIGV4cG9zZSBmcm9tIHRoZSBtb2R1bGUuIFRoaXMgc2hvdWxkXG4vLyBiZSBlbGltaW5hdGVkIHdoZW4gd2UndmUgbW92ZWQgdGhlIG90aGVyIHJvdXRlcyB0byB0aGUgbmV3IGZvcm1hdC4gVGhlc2Vcbi8vIGFyZSB1c2VkIHRvIGhvb2sgaW50byB0aGUgcm91dGUuXG5jb25zdCB7IHdvcmtBc3luY1N0b3JhZ2UsIHdvcmtVbml0QXN5bmNTdG9yYWdlLCBzZXJ2ZXJIb29rcyB9ID0gcm91dGVNb2R1bGU7XG5mdW5jdGlvbiBwYXRjaEZldGNoKCkge1xuICAgIHJldHVybiBfcGF0Y2hGZXRjaCh7XG4gICAgICAgIHdvcmtBc3luY1N0b3JhZ2UsXG4gICAgICAgIHdvcmtVbml0QXN5bmNTdG9yYWdlXG4gICAgfSk7XG59XG5leHBvcnQgeyByb3V0ZU1vZHVsZSwgd29ya0FzeW5jU3RvcmFnZSwgd29ya1VuaXRBc3luY1N0b3JhZ2UsIHNlcnZlckhvb2tzLCBwYXRjaEZldGNoLCAgfTtcblxuLy8jIHNvdXJjZU1hcHBpbmdVUkw9YXBwLXJvdXRlLmpzLm1hcCJdLCJuYW1lcyI6W10sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&page=%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproxy%2F%5B...path%5D%2Froute.ts&appDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!\n");
+
+/***/ }),
+
+/***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=true!":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=true! ***!
+  \******************************************************************************************************/
+/***/ (() => {
+
+
+
+/***/ }),
+
+/***/ "(rsc)/./src/app/api/proxy/[...path]/route.ts":
+/*!**********************************************!*\
+  !*** ./src/app/api/proxy/[...path]/route.ts ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   DELETE: () => (/* binding */ DELETE),\n/* harmony export */   GET: () => (/* binding */ GET),\n/* harmony export */   PATCH: () => (/* binding */ PATCH),\n/* harmony export */   POST: () => (/* binding */ POST),\n/* harmony export */   PUT: () => (/* binding */ PUT),\n/* harmony export */   dynamic: () => (/* binding */ dynamic)\n/* harmony export */ });\n/* harmony import */ var next_server__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/server */ \"(rsc)/./node_modules/next/dist/api/server.js\");\n// src/app/api/proxy/[...path]/route.ts\n\nconst BACKEND_URL = process.env.BACKEND_URL ?? 'https://api.mindspeak.xyz/api';\nasync function proxyRequest(request, method, pathSegments) {\n    const path = pathSegments.join('/');\n    const baseUrl = `${BACKEND_URL}/${path}`;\n    const url = method === 'GET' || method === 'DELETE' ? `${baseUrl}${request.nextUrl.search}` : baseUrl;\n    const headers = new Headers();\n    const auth = request.headers.get('authorization');\n    if (auth) headers.set('Authorization', auth);\n    headers.set('Accept', 'application/json');\n    let body;\n    const contentType = request.headers.get('content-type') ?? '';\n    if (method !== 'GET' && method !== 'DELETE') {\n        if (contentType.includes('multipart/form-data')) {\n            body = await request.formData();\n        } else {\n            headers.set('Content-Type', 'application/json');\n            const parsed = await request.json().catch(()=>({}));\n            body = JSON.stringify(parsed);\n        }\n    }\n    const res = await fetch(url, {\n        method,\n        headers,\n        body\n    });\n    const text = await res.text();\n    let data;\n    try {\n        data = JSON.parse(text);\n    } catch  {\n        data = {\n            raw: text\n        };\n    }\n    return next_server__WEBPACK_IMPORTED_MODULE_0__.NextResponse.json(data, {\n        status: res.status\n    });\n}\nasync function GET(request) {\n    const path = request.url.split('/api/proxy/')[1].split('?')[0].split('/');\n    return proxyRequest(request, 'GET', path);\n}\nasync function POST(request) {\n    const path = request.url.split('/api/proxy/')[1].split('?')[0].split('/');\n    return proxyRequest(request, 'POST', path);\n}\nasync function PUT(request) {\n    const path = request.url.split('/api/proxy/')[1].split('?')[0].split('/');\n    return proxyRequest(request, 'PUT', path);\n}\nasync function PATCH(request) {\n    const path = request.url.split('/api/proxy/')[1].split('?')[0].split('/');\n    return proxyRequest(request, 'PATCH', path);\n}\nasync function DELETE(request) {\n    const path = request.url.split('/api/proxy/')[1].split('?')[0].split('/');\n    return proxyRequest(request, 'DELETE', path);\n}\nconst dynamic = 'force-dynamic';\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL2FwaS9wcm94eS9bLi4ucGF0aF0vcm91dGUudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHVDQUF1QztBQUNnQjtBQUV2RCxNQUFNQyxjQUFjQyxRQUFRQyxHQUFHLENBQUNGLFdBQVcsSUFBSTtBQUkvQyxlQUFlRyxhQUNiQyxPQUFvQixFQUNwQkMsTUFBa0IsRUFDbEJDLFlBQXNCO0lBRXRCLE1BQU1DLE9BQU9ELGFBQWFFLElBQUksQ0FBQztJQUMvQixNQUFNQyxVQUFVLEdBQUdULFlBQVksQ0FBQyxFQUFFTyxNQUFNO0lBQ3hDLE1BQU1HLE1BQ0pMLFdBQVcsU0FBU0EsV0FBVyxXQUMzQixHQUFHSSxVQUFVTCxRQUFRTyxPQUFPLENBQUNDLE1BQU0sRUFBRSxHQUNyQ0g7SUFFTixNQUFNSSxVQUFVLElBQUlDO0lBQ3BCLE1BQU1DLE9BQU9YLFFBQVFTLE9BQU8sQ0FBQ0csR0FBRyxDQUFDO0lBQ2pDLElBQUlELE1BQU1GLFFBQVFJLEdBQUcsQ0FBQyxpQkFBaUJGO0lBQ3ZDRixRQUFRSSxHQUFHLENBQUMsVUFBVTtJQUV0QixJQUFJQztJQUNKLE1BQU1DLGNBQWNmLFFBQVFTLE9BQU8sQ0FBQ0csR0FBRyxDQUFDLG1CQUFtQjtJQUMzRCxJQUFJWCxXQUFXLFNBQVNBLFdBQVcsVUFBVTtRQUMzQyxJQUFJYyxZQUFZQyxRQUFRLENBQUMsd0JBQXdCO1lBQy9DRixPQUFPLE1BQU1kLFFBQVFpQixRQUFRO1FBQy9CLE9BQU87WUFDTFIsUUFBUUksR0FBRyxDQUFDLGdCQUFnQjtZQUM1QixNQUFNSyxTQUFTLE1BQU1sQixRQUFRbUIsSUFBSSxHQUFHQyxLQUFLLENBQUMsSUFBTyxFQUFDO1lBQ2xETixPQUFPTyxLQUFLQyxTQUFTLENBQUNKO1FBQ3hCO0lBQ0Y7SUFFQSxNQUFNSyxNQUFNLE1BQU1DLE1BQU1sQixLQUFLO1FBQUVMO1FBQVFRO1FBQVNLO0lBQUs7SUFDckQsTUFBTVcsT0FBTyxNQUFNRixJQUFJRSxJQUFJO0lBRTNCLElBQUlDO0lBQ0osSUFBSTtRQUNGQSxPQUFPTCxLQUFLTSxLQUFLLENBQUNGO0lBQ3BCLEVBQUUsT0FBTTtRQUNOQyxPQUFPO1lBQUVFLEtBQUtIO1FBQUs7SUFDckI7SUFFQSxPQUFPOUIscURBQVlBLENBQUN3QixJQUFJLENBQUNPLE1BQWlDO1FBQ3hERyxRQUFRTixJQUFJTSxNQUFNO0lBQ3BCO0FBQ0Y7QUFFTyxlQUFlQyxJQUFJOUIsT0FBb0I7SUFDNUMsTUFBTUcsT0FBT0gsUUFBUU0sR0FBRyxDQUFDeUIsS0FBSyxDQUFDLGNBQWMsQ0FBQyxFQUFFLENBQUNBLEtBQUssQ0FBQyxJQUFJLENBQUMsRUFBRSxDQUFDQSxLQUFLLENBQUM7SUFDckUsT0FBT2hDLGFBQWFDLFNBQVMsT0FBT0c7QUFDdEM7QUFFTyxlQUFlNkIsS0FBS2hDLE9BQW9CO0lBQzdDLE1BQU1HLE9BQU9ILFFBQVFNLEdBQUcsQ0FBQ3lCLEtBQUssQ0FBQyxjQUFjLENBQUMsRUFBRSxDQUFDQSxLQUFLLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQ0EsS0FBSyxDQUFDO0lBQ3JFLE9BQU9oQyxhQUFhQyxTQUFTLFFBQVFHO0FBQ3ZDO0FBRU8sZUFBZThCLElBQUlqQyxPQUFvQjtJQUM1QyxNQUFNRyxPQUFPSCxRQUFRTSxHQUFHLENBQUN5QixLQUFLLENBQUMsY0FBYyxDQUFDLEVBQUUsQ0FBQ0EsS0FBSyxDQUFDLElBQUksQ0FBQyxFQUFFLENBQUNBLEtBQUssQ0FBQztJQUNyRSxPQUFPaEMsYUFBYUMsU0FBUyxPQUFPRztBQUN0QztBQUVPLGVBQWUrQixNQUFNbEMsT0FBb0I7SUFDOUMsTUFBTUcsT0FBT0gsUUFBUU0sR0FBRyxDQUFDeUIsS0FBSyxDQUFDLGNBQWMsQ0FBQyxFQUFFLENBQUNBLEtBQUssQ0FBQyxJQUFJLENBQUMsRUFBRSxDQUFDQSxLQUFLLENBQUM7SUFDckUsT0FBT2hDLGFBQWFDLFNBQVMsU0FBU0c7QUFDeEM7QUFFTyxlQUFlZ0MsT0FBT25DLE9BQW9CO0lBQy9DLE1BQU1HLE9BQU9ILFFBQVFNLEdBQUcsQ0FBQ3lCLEtBQUssQ0FBQyxjQUFjLENBQUMsRUFBRSxDQUFDQSxLQUFLLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQ0EsS0FBSyxDQUFDO0lBQ3JFLE9BQU9oQyxhQUFhQyxTQUFTLFVBQVVHO0FBQ3pDO0FBRU8sTUFBTWlDLFVBQVUsZ0JBQWUiLCJzb3VyY2VzIjpbIi9Vc2Vycy9zY2QvRG9jdW1lbnRzL0dpdEh1Yi9taW5kc3BlYWstc3lzL2NsaWVudC9zcmMvYXBwL2FwaS9wcm94eS9bLi4ucGF0aF0vcm91dGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gc3JjL2FwcC9hcGkvcHJveHkvWy4uLnBhdGhdL3JvdXRlLnRzXG5pbXBvcnQgeyBOZXh0UmVxdWVzdCwgTmV4dFJlc3BvbnNlIH0gZnJvbSAnbmV4dC9zZXJ2ZXInXG5cbmNvbnN0IEJBQ0tFTkRfVVJMID0gcHJvY2Vzcy5lbnYuQkFDS0VORF9VUkwgPz8gJ2h0dHBzOi8vYXBpLm1pbmRzcGVhay54eXovYXBpJ1xuXG50eXBlIEh0dHBNZXRob2QgPSAnR0VUJyB8ICdQT1NUJyB8ICdQVVQnIHwgJ1BBVENIJyB8ICdERUxFVEUnXG5cbmFzeW5jIGZ1bmN0aW9uIHByb3h5UmVxdWVzdChcbiAgcmVxdWVzdDogTmV4dFJlcXVlc3QsXG4gIG1ldGhvZDogSHR0cE1ldGhvZCxcbiAgcGF0aFNlZ21lbnRzOiBzdHJpbmdbXVxuKTogUHJvbWlzZTxOZXh0UmVzcG9uc2U+IHtcbiAgY29uc3QgcGF0aCA9IHBhdGhTZWdtZW50cy5qb2luKCcvJylcbiAgY29uc3QgYmFzZVVybCA9IGAke0JBQ0tFTkRfVVJMfS8ke3BhdGh9YFxuICBjb25zdCB1cmwgPVxuICAgIG1ldGhvZCA9PT0gJ0dFVCcgfHwgbWV0aG9kID09PSAnREVMRVRFJ1xuICAgICAgPyBgJHtiYXNlVXJsfSR7cmVxdWVzdC5uZXh0VXJsLnNlYXJjaH1gXG4gICAgICA6IGJhc2VVcmxcblxuICBjb25zdCBoZWFkZXJzID0gbmV3IEhlYWRlcnMoKVxuICBjb25zdCBhdXRoID0gcmVxdWVzdC5oZWFkZXJzLmdldCgnYXV0aG9yaXphdGlvbicpXG4gIGlmIChhdXRoKSBoZWFkZXJzLnNldCgnQXV0aG9yaXphdGlvbicsIGF1dGgpXG4gIGhlYWRlcnMuc2V0KCdBY2NlcHQnLCAnYXBwbGljYXRpb24vanNvbicpXG5cbiAgbGV0IGJvZHk6IEJvZHlJbml0IHwgdW5kZWZpbmVkXG4gIGNvbnN0IGNvbnRlbnRUeXBlID0gcmVxdWVzdC5oZWFkZXJzLmdldCgnY29udGVudC10eXBlJykgPz8gJydcbiAgaWYgKG1ldGhvZCAhPT0gJ0dFVCcgJiYgbWV0aG9kICE9PSAnREVMRVRFJykge1xuICAgIGlmIChjb250ZW50VHlwZS5pbmNsdWRlcygnbXVsdGlwYXJ0L2Zvcm0tZGF0YScpKSB7XG4gICAgICBib2R5ID0gYXdhaXQgcmVxdWVzdC5mb3JtRGF0YSgpXG4gICAgfSBlbHNlIHtcbiAgICAgIGhlYWRlcnMuc2V0KCdDb250ZW50LVR5cGUnLCAnYXBwbGljYXRpb24vanNvbicpXG4gICAgICBjb25zdCBwYXJzZWQgPSBhd2FpdCByZXF1ZXN0Lmpzb24oKS5jYXRjaCgoKSA9PiAoe30pKVxuICAgICAgYm9keSA9IEpTT04uc3RyaW5naWZ5KHBhcnNlZClcbiAgICB9XG4gIH1cblxuICBjb25zdCByZXMgPSBhd2FpdCBmZXRjaCh1cmwsIHsgbWV0aG9kLCBoZWFkZXJzLCBib2R5IH0pXG4gIGNvbnN0IHRleHQgPSBhd2FpdCByZXMudGV4dCgpXG5cbiAgbGV0IGRhdGE6IHVua25vd25cbiAgdHJ5IHtcbiAgICBkYXRhID0gSlNPTi5wYXJzZSh0ZXh0KSBhcyB1bmtub3duXG4gIH0gY2F0Y2gge1xuICAgIGRhdGEgPSB7IHJhdzogdGV4dCB9XG4gIH1cblxuICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oZGF0YSBhcyBSZWNvcmQ8c3RyaW5nLCB1bmtub3duPiwge1xuICAgIHN0YXR1czogcmVzLnN0YXR1cyxcbiAgfSlcbn1cblxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIEdFVChyZXF1ZXN0OiBOZXh0UmVxdWVzdCkge1xuICBjb25zdCBwYXRoID0gcmVxdWVzdC51cmwuc3BsaXQoJy9hcGkvcHJveHkvJylbMV0uc3BsaXQoJz8nKVswXS5zcGxpdCgnLycpXG4gIHJldHVybiBwcm94eVJlcXVlc3QocmVxdWVzdCwgJ0dFVCcsIHBhdGgpXG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBQT1NUKHJlcXVlc3Q6IE5leHRSZXF1ZXN0KSB7XG4gIGNvbnN0IHBhdGggPSByZXF1ZXN0LnVybC5zcGxpdCgnL2FwaS9wcm94eS8nKVsxXS5zcGxpdCgnPycpWzBdLnNwbGl0KCcvJylcbiAgcmV0dXJuIHByb3h5UmVxdWVzdChyZXF1ZXN0LCAnUE9TVCcsIHBhdGgpXG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBQVVQocmVxdWVzdDogTmV4dFJlcXVlc3QpIHtcbiAgY29uc3QgcGF0aCA9IHJlcXVlc3QudXJsLnNwbGl0KCcvYXBpL3Byb3h5LycpWzFdLnNwbGl0KCc/JylbMF0uc3BsaXQoJy8nKVxuICByZXR1cm4gcHJveHlSZXF1ZXN0KHJlcXVlc3QsICdQVVQnLCBwYXRoKVxufVxuXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gUEFUQ0gocmVxdWVzdDogTmV4dFJlcXVlc3QpIHtcbiAgY29uc3QgcGF0aCA9IHJlcXVlc3QudXJsLnNwbGl0KCcvYXBpL3Byb3h5LycpWzFdLnNwbGl0KCc/JylbMF0uc3BsaXQoJy8nKVxuICByZXR1cm4gcHJveHlSZXF1ZXN0KHJlcXVlc3QsICdQQVRDSCcsIHBhdGgpXG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBERUxFVEUocmVxdWVzdDogTmV4dFJlcXVlc3QpIHtcbiAgY29uc3QgcGF0aCA9IHJlcXVlc3QudXJsLnNwbGl0KCcvYXBpL3Byb3h5LycpWzFdLnNwbGl0KCc/JylbMF0uc3BsaXQoJy8nKVxuICByZXR1cm4gcHJveHlSZXF1ZXN0KHJlcXVlc3QsICdERUxFVEUnLCBwYXRoKVxufVxuXG5leHBvcnQgY29uc3QgZHluYW1pYyA9ICdmb3JjZS1keW5hbWljJ1xuIl0sIm5hbWVzIjpbIk5leHRSZXNwb25zZSIsIkJBQ0tFTkRfVVJMIiwicHJvY2VzcyIsImVudiIsInByb3h5UmVxdWVzdCIsInJlcXVlc3QiLCJtZXRob2QiLCJwYXRoU2VnbWVudHMiLCJwYXRoIiwiam9pbiIsImJhc2VVcmwiLCJ1cmwiLCJuZXh0VXJsIiwic2VhcmNoIiwiaGVhZGVycyIsIkhlYWRlcnMiLCJhdXRoIiwiZ2V0Iiwic2V0IiwiYm9keSIsImNvbnRlbnRUeXBlIiwiaW5jbHVkZXMiLCJmb3JtRGF0YSIsInBhcnNlZCIsImpzb24iLCJjYXRjaCIsIkpTT04iLCJzdHJpbmdpZnkiLCJyZXMiLCJmZXRjaCIsInRleHQiLCJkYXRhIiwicGFyc2UiLCJyYXciLCJzdGF0dXMiLCJHRVQiLCJzcGxpdCIsIlBPU1QiLCJQVVQiLCJQQVRDSCIsIkRFTEVURSIsImR5bmFtaWMiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(rsc)/./src/app/api/proxy/[...path]/route.ts\n");
+
+/***/ }),
+
+/***/ "(ssr)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=true!":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=true! ***!
+  \******************************************************************************************************/
+/***/ (() => {
+
+
+
+/***/ }),
+
+/***/ "../app-render/after-task-async-storage.external":
+/*!***********************************************************************************!*\
+  !*** external "next/dist/server/app-render/after-task-async-storage.external.js" ***!
+  \***********************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/server/app-render/after-task-async-storage.external.js");
+
+/***/ }),
+
+/***/ "../app-render/work-async-storage.external":
+/*!*****************************************************************************!*\
+  !*** external "next/dist/server/app-render/work-async-storage.external.js" ***!
+  \*****************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/server/app-render/work-async-storage.external.js");
+
+/***/ }),
+
+/***/ "./work-unit-async-storage.external":
+/*!**********************************************************************************!*\
+  !*** external "next/dist/server/app-render/work-unit-async-storage.external.js" ***!
+  \**********************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/server/app-render/work-unit-async-storage.external.js");
+
+/***/ }),
+
+/***/ "next/dist/compiled/next-server/app-page.runtime.dev.js":
+/*!*************************************************************************!*\
+  !*** external "next/dist/compiled/next-server/app-page.runtime.dev.js" ***!
+  \*************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/compiled/next-server/app-page.runtime.dev.js");
+
+/***/ }),
+
+/***/ "next/dist/compiled/next-server/app-route.runtime.dev.js":
+/*!**************************************************************************!*\
+  !*** external "next/dist/compiled/next-server/app-route.runtime.dev.js" ***!
+  \**************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/compiled/next-server/app-route.runtime.dev.js");
+
+/***/ })
+
+};
+;
+
+// load runtime
+var __webpack_require__ = require("../../../../webpack-runtime.js");
+__webpack_require__.C(exports);
+var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&page=%2Fapi%2Fproxy%2F%5B...path%5D%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproxy%2F%5B...path%5D%2Froute.ts&appDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fscd%2FDocuments%2FGitHub%2Fmindspeak-sys%2Fclient&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
+module.exports = __webpack_exports__;
+
+})();

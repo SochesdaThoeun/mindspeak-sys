@@ -16,7 +16,7 @@ export const useAuth = () => {
     token: auth?.token || null,
     isAuthenticated: auth?.isAuthenticated || false,
     isLoading: auth?.isLoading || false,
-    error: auth?.error || null
+    error: auth?.error ?? null  // Use nullish coalescing to preserve arrays
   }
 }
 

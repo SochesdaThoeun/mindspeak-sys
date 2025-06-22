@@ -16,7 +16,7 @@ export interface AuthState {
   token: string | null
   isAuthenticated: boolean
   isLoading: boolean
-  error: string | null
+  error: string | string[] | null
 }
 
 // API Request/Response payloads
