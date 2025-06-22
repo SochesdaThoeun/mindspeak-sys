@@ -1,5 +1,10 @@
 # MindSpeak 🧠💭
 
+
+FULL URL: https://mindspeak-sys.vercel.app/auth/login
+
+
+
 A safe, anonymous confession platform designed to support mental health and well-being for university students.
 
 ## Project Structure
@@ -10,6 +15,10 @@ A safe, anonymous confession platform designed to support mental health and well
 ## About MindSpeak
 
 MindSpeak provides university students with a safe, anonymous space to share their thoughts, struggles, and experiences. The platform aims to reduce mental health stigma by creating a supportive community where students can express themselves freely without fear of judgment.
+
+
+### Team Project
+University team project
 
 ### Key Features
 - Anonymous confessions and community support
