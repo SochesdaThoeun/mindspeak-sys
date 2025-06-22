@@ -1,7 +1,7 @@
 // src/app/api/proxy/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'https://api.mindspeak.xyz/api'
+const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:8000/api'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 

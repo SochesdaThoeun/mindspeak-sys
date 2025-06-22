@@ -28,7 +28,8 @@
       "images.unsplash.com",
       "localhost",
       "www.gravatar.com",
-      "api.mindspeak.xyz"
+      "api.mindspeak.xyz",
+      "127.0.0.1"
     ],
     "disableStaticImages": false,
     "minimumCacheTTL": 60,

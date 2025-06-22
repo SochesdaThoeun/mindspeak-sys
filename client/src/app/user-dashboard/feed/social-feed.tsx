@@ -174,13 +174,13 @@ export default function SocialFeed() {
     if (node) observer.current.observe(node)
   }, [isLoading, isLoadingMore, hasMore, page, dispatch])
 
-  // Clear errors when user starts typing
+  // Clear errors when user starts typing or making changes
   useEffect(() => {
     if (postError || validationErrors) {
       setPostError(null)
       setValidationErrors(null)
     }
-  }, [newPostTitle, newPostText, selectedImage, selectedLink, hashtags, postError, validationErrors])
+  }, [newPostTitle, newPostText, selectedImage, selectedLink, hashtags])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -259,24 +259,33 @@ export default function SocialFeed() {
     } catch (error: unknown) {
       console.error('Failed to create post:', error)
       
-      // Handle the specific error format
+      // Handle the specific error format from Redux Toolkit
       interface ValidationError {
         message?: string;
         errors?: Record<string, string[]>;
       }
       
-      const err = error as ValidationError // Type assertion for error handling
-      if (err?.errors && typeof err.errors === 'object') {
-        // Handle validation errors
+      const err = error as ValidationError
+      
+      // Check if this is a validation error with specific field errors
+      if (err?.errors && typeof err.errors === 'object' && Object.keys(err.errors).length > 0) {
+        // Handle validation errors - show specific field errors
         setValidationErrors(err.errors)
-        setPostError(err.message || "Validation failed")
+        
+        // Create a more descriptive error message
+        const fieldNames = Object.keys(err.errors)
+        const errorMessage = `Please fix the following issues: ${fieldNames.join(', ')}`
+        setPostError(errorMessage)
       } else if (err?.message) {
         // Handle general error message
         setPostError(err.message)
+        setValidationErrors(null)
       } else if (typeof error === 'string') {
         setPostError(error)
+        setValidationErrors(null)
       } else {
         setPostError("Failed to create post. Please try again.")
+        setValidationErrors(null)
       }
     } finally {
       setIsCreating(false)
@@ -468,15 +477,18 @@ export default function SocialFeed() {
                   </h3>
                 )}
                 {validationErrors && (
-                  <div className="space-y-1">
+                  <div className="space-y-2 mt-2">
                     {Object.entries(validationErrors).map(([field, errors]) => (
-                      <div key={field}>
-                        <p className="text-sm font-medium text-red-700 dark:text-red-300 capitalize">
-                          {field}:
+                      <div key={field} className="bg-red-100 dark:bg-red-900/30 p-3 rounded-md">
+                        <p className="text-sm font-semibold text-red-800 dark:text-red-200 capitalize mb-1">
+                          {field} {field === 'title' ? 'Issue' : field === 'content' ? 'Issue' : 'Error'}:
                         </p>
-                        <ul className="list-disc list-inside text-sm text-red-600 dark:text-red-400 ml-2">
+                        <ul className="space-y-1">
                           {errors.map((error, index) => (
-                            <li key={index}>{error}</li>
+                            <li key={index} className="text-sm text-red-700 dark:text-red-300 flex items-start">
+                              <span className="mr-2">•</span>
+                              <span>{error}</span>
+                            </li>
                           ))}
                         </ul>
                       </div>
