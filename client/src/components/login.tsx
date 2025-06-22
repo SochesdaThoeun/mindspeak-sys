@@ -12,7 +12,7 @@ import logo from "@/assets/logo9.png";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // Redux imports
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 import { useAuth } from "@/store/hooks";
 import { loginUser, registerUser, clearError } from "@/store/slices/authSlice";
 import { LoginPayload, RegisterPayload } from "@/store/types/auth";
@@ -50,6 +50,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
     if (error) {
       dispatch(clearError());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogin, dispatch]); // Removed 'error' from dependencies to prevent clearing on error updates
 
   // Redirect if user is already authenticated
