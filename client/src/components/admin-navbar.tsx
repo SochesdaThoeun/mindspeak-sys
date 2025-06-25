@@ -7,10 +7,7 @@ import {
   Menu,
   LogOut,
   ChevronDown,
-  Moon,
-  Sun,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import {
   Avatar,
@@ -51,7 +48,6 @@ export function Navbar({
   sidebarCollapsed,
 }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
-  const { theme, setTheme } = useTheme();
   const router = useRouter();
   
   // Redux hooks
@@ -328,22 +324,6 @@ export function Navbar({
                 </div>
               </DropdownMenuLabel>
               {/* Dark Mode Toggle */}
-              <DropdownMenuItem
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="px-4 py-3 hover:bg-white/50 dark:hover:bg-white/10 rounded-lg mx-2 my-1"
-              >
-                {theme === "dark" ? (
-                  <>
-                    <Sun className="mr-3 h-4 w-4" />
-                    <span>Light Mode</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="mr-3 h-4 w-4" />
-                    <span>Dark Mode</span>
-                  </>
-                )}
-              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/30" />
               <DropdownMenuItem
                 onClick={handleLogout}

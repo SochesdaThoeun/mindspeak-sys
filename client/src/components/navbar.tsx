@@ -1,6 +1,6 @@
 "use client"
 
-import { BellRing, ChevronDown, BookOpen, User, LogOut, Moon, Sun } from "lucide-react"
+import { BellRing, ChevronDown, BookOpen, User, LogOut } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
@@ -32,7 +32,7 @@ import { fetchNotifications, markAllAsRead, fetchUnreadCount } from "@/store/sli
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
-  const { theme, systemTheme, setTheme } = useTheme()
+  const { theme, systemTheme } = useTheme()
   
   // Redux hooks
   const dispatch = useAppDispatch()
@@ -365,23 +365,6 @@ export function Navbar() {
                       <User className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
                       <span>Profile</span>
                     </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    className="flex items-center gap-2 px-3 py-2.5 cursor-pointer rounded-lg text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  >
-                    {theme === "dark" ? (
-                      <>
-                        <Sun className="h-4 w-4 mr-2 text-amber-500" />
-                        <span>Light Mode</span>
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="h-4 w-4 mr-2 text-indigo-600 dark:text-indigo-400" />
-                        <span>Dark Mode</span>
-                      </>
-                    )}
                   </DropdownMenuItem>
                 </div>
 

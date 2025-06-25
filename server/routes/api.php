@@ -125,6 +125,7 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
     Route::get('/admin/posts/rejected', [AdminPostController::class, 'rejected']);
     Route::put('/admin/posts/{id}/approve', [AdminPostController::class, 'approve']);
     Route::put('/admin/posts/{id}/reject', [AdminPostController::class, 'reject']);
+    Route::delete('/admin/posts/{id}', [AdminPostController::class, 'destroy']);
     Route::get('/admin/posts/statistics', [AdminPostController::class, 'statistics']);
 
     // ===== COMMENT MANAGEMENT =====

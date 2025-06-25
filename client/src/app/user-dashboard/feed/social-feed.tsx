@@ -77,6 +77,9 @@ export default function SocialFeed() {
   const [postError, setPostError] = useState<string | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]> | null>(null)
   
+  // Success state for post creation
+  const [postSuccess, setPostSuccess] = useState<string | null>(null)
+  
   // Error states for likes and comments
   const [likeError, setLikeError] = useState<string | null>(null)
   const [commentError] = useState<Record<number, string>>({})
@@ -180,7 +183,7 @@ export default function SocialFeed() {
       setPostError(null)
       setValidationErrors(null)
     }
-  }, [newPostTitle, newPostText, selectedImage, selectedLink, hashtags])
+  }, [newPostTitle, newPostText, selectedImage, selectedLink, hashtags, postError, validationErrors])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -227,6 +230,7 @@ export default function SocialFeed() {
     setIsCreating(true)
     setPostError(null)
     setValidationErrors(null)
+    setPostSuccess(null)
     
     try {
       const postData = {
@@ -250,6 +254,10 @@ export default function SocialFeed() {
       setHashtagInput("")
       setIsHashtagInputVisible(false)
       removeImage()
+      
+      // Set success message
+      setPostSuccess("Post created successfully!")
+      setTimeout(() => setPostSuccess(null), 5000)
       
       // Refresh posts to get updated data
       const response = await dispatch(getPublicPosts({ page: 1 })).unwrap()
@@ -508,6 +516,45 @@ export default function SocialFeed() {
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Post Success Alert */}
+      {postSuccess && (
+        <Card className="border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800 sticky top-0 z-10">
+          <CardContent className="p-4">
+            <div className="flex items-start space-x-2">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  {postSuccess} Your post has been shared with the community.
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/user-dashboard/my-posts')}
+                  className="flex-shrink-0 border-green-300 text-green-700 hover:bg-green-100 dark:border-green-600 dark:text-green-300 dark:hover:bg-green-900/30"
+                >
+                  View My Posts
+                </Button>
+                <button
+                  onClick={() => setPostSuccess(null)}
+                  className="flex-shrink-0 text-green-400 hover:text-green-600 dark:hover:text-green-300"
+                >
+                  <span className="sr-only">Dismiss</span>
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -4,14 +4,29 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Heart, MessageCircle, Clock, CheckCircle, XCircle, Trash2, MoreVertical } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import Link from "next/link";
 import logo8 from "@/assets/logo8.png";
 import { useAppDispatch, usePosts, getUserPostsByStatus, getAllUserPosts } from "@/store/hooks";
+import { deletePost } from "@/store/slices/postSlice";
 import { Post } from "@/store/types/post";
 
 const getStatusIcon = (status: Post["status"]) => {
@@ -47,153 +62,270 @@ const formatDate = (dateString: string) => {
   });
 };
 
+// Delete confirmation modal component
+function DeleteConfirmationModal({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  postTitle,
+  isDeleting 
+}: { 
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  postTitle: string;
+  isDeleting: boolean;
+}) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-red-600">
+            <Trash2 className="h-5 w-5" />
+            Delete Post
+          </DialogTitle>
+          <DialogDescription className="text-left">
+            Are you sure you want to delete this post?
+            <br />
+            <strong className="text-gray-900">&quot;{postTitle}&quot;</strong>
+            <br />
+            <br />
+            This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="gap-2"
+          >
+            {isDeleting ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <Trash2 className="h-4 w-4" />
+                Delete Post
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function PostCard({ post }: { post: Post }) {
+  const dispatch = useAppDispatch();
+  const { isDeleting } = usePosts();
   const [showFullContent, setShowFullContent] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const contentPreview = post.content.length > 150 ? post.content.substring(0, 150) + "..." : post.content;
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await dispatch(deletePost(post.id)).unwrap();
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+      // Keep modal open on error so user can try again
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Link href={`/user-dashboard/feed/${post.id}`}>
-        <Card className="overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 cursor-pointer">
-          <div className="p-6">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 border-2 border-gray-100">
-                  <AvatarImage src={post.author_avatar || logo8.src} alt="User avatar" />
-                  <AvatarFallback>
-                    {post.is_anonymous ? "A" : (post.author?.charAt(0).toUpperCase() || "U")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900">
-                      {post.is_anonymous ? "Anonymous" : (post.author || "Your Post")}
-                    </h3>
-                    {getStatusIcon(post.status)}
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link href={`/user-dashboard/feed/${post.id}`}>
+          <Card className="overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border-2 border-gray-100">
+                    <AvatarImage src={post.author_avatar || logo8.src} alt="User avatar" />
+                    <AvatarFallback>
+                      {post.is_anonymous ? "A" : (post.author?.charAt(0).toUpperCase() || "U")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-gray-900">
+                        {post.is_anonymous ? "Anonymous" : (post.author || "Your Post")}
+                      </h3>
+                      {getStatusIcon(post.status)}
+                    </div>
+                    <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
                   </div>
-                  <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(post.status)}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={handleDeleteClick}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Post
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(post.status)}
-              </div>
-            </div>
 
-            {/* Content */}
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h2>
-              <p className="text-gray-700 mb-3">
-                {showFullContent ? post.content : contentPreview}
-                {post.content.length > 150 && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowFullContent(!showFullContent);
-                    }}
-                    className="text-blue-500 hover:text-blue-700 ml-1 font-medium"
-                  >
-                    {showFullContent ? "Show less" : "Read more"}
-                  </button>
+              {/* Content */}
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h2>
+                <p className="text-gray-700 mb-3">
+                  {showFullContent ? post.content : contentPreview}
+                  {post.content.length > 150 && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowFullContent(!showFullContent);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 ml-1 font-medium"
+                    >
+                      {showFullContent ? "Show less" : "Read more"}
+                    </button>
+                  )}
+                </p>
+
+                {/* Emotion */}
+                {post.emotion && (
+                  <div className="mb-3">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                      😊 Feeling {post.emotion}
+                    </span>
+                  </div>
                 )}
-              </p>
 
-              {/* Emotion */}
-              {post.emotion && (
-                <div className="mb-3">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                    😊 Feeling {post.emotion}
-                  </span>
+                {/* Link */}
+                {post.link && (
+                  <div className="mb-3">
+                    <a
+                      href={post.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      View Link
+                    </a>
+                  </div>
+                )}
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {post.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="bg-sky-50 text-sky-600 hover:bg-sky-100">
+                      #{tag}
+                    </Badge>
+                  ))}
                 </div>
-              )}
 
-              {/* Link */}
-              {post.link && (
-                <div className="mb-3">
-                  <a
-                    href={post.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition-colors"
+                {/* Image */}
+                {post.image && post.image.url && (
+                  <div 
+                    className="relative cursor-pointer flex justify-center mb-3"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    View Link
-                  </a>
-                </div>
-              )}
-              
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {post.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="bg-sky-50 text-sky-600 hover:bg-sky-100">
-                    #{tag}
-                  </Badge>
-                ))}
+                    <div className="overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-lg flex justify-center items-center">
+                      <Image
+                        src={post.image.url}
+                        width={800}
+                        height={300}
+                        alt={post.image.alt_text || "Post image"}
+                        className="w-auto object-cover hover:scale-105 transition-transform duration-300"
+                        style={{
+                          minHeight: '300px',
+                          maxHeight: '70vh',
+                          width: 'auto',
+                          objectFit: 'cover',
+                          margin: '0 auto'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Admin Note for rejected posts */}
+                {post.status === "rejected" && post.admin_note && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
+                    <div className="flex items-start gap-2">
+                      <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-red-800">Admin Feedback</p>
+                        <p className="text-sm text-red-700">{post.admin_note}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Image */}
-              {post.image && post.image.url && (
-                <div 
-                  className="relative cursor-pointer flex justify-center mb-3"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-lg flex justify-center items-center">
-                    <Image
-                      src={post.image.url}
-                      width={800}
-                      height={300}
-                      alt={post.image.alt_text || "Post image"}
-                      className="w-auto object-cover hover:scale-105 transition-transform duration-300"
-                      style={{
-                        minHeight: '300px',
-                        maxHeight: '70vh',
-                        width: 'auto',
-                        objectFit: 'cover',
-                        margin: '0 auto'
-                      }}
-                    />
+              {/* Stats */}
+              {post.status === "approved" && (
+                <div className="flex items-center gap-6 text-gray-500 text-sm border-t pt-3">
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-4 w-4" />
+                    <span>{post.like_count}</span>
                   </div>
-                </div>
-              )}
-
-              {/* Admin Note for rejected posts */}
-              {post.status === "rejected" && post.admin_note && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
-                  <div className="flex items-start gap-2">
-                    <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-red-800">Admin Feedback</p>
-                      <p className="text-sm text-red-700">{post.admin_note}</p>
-                    </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{post.comment_count}</span>
                   </div>
                 </div>
               )}
             </div>
+          </Card>
+        </Link>
+      </motion.div>
 
-            {/* Stats */}
-            {post.status === "approved" && (
-              <div className="flex items-center gap-6 text-gray-500 text-sm border-t pt-3">
-                <div className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" />
-                  <span>{post.like_count}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{post.comment_count}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </Card>
-      </Link>
-    </motion.div>
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        postTitle={post.title}
+        isDeleting={isDeleting}
+      />
+    </>
   );
 }
 

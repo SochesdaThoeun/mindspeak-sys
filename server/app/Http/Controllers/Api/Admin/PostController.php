@@ -557,4 +557,69 @@ class PostController extends Controller
             return ResponseHelper::error('Failed to retrieve post statistics', 500, $e->getMessage());
         }
     }
+
+    /**
+     * Remove the specified post (admin can delete any post).
+     *
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        try {
+            // Ensure user is admin
+            if (!Auth::check() || Auth::user()->role !== 'admin') {
+                return ResponseHelper::error('Unauthorized access', 403);
+            }
+
+            $post = Post::findOrFail($id);
+
+            DB::beginTransaction();
+
+            // Delete image files if they exist
+            if ($post->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($post->image);
+                $metadata = $post->image_metadata;
+                if (isset($metadata['thumbnail'])) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($metadata['thumbnail']);
+                }
+                if (isset($metadata['optimized'])) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($metadata['optimized']);
+                }
+            }
+
+            // Delete related data
+            $post->likes()->delete();
+            $post->comments()->delete();
+            $post->tags()->detach();
+            
+            // Send notification to post author if not anonymous
+            if ($post->user_id) {
+                NotificationHelper::createNotification(
+                    $post->user_id,
+                    'post_deleted',
+                    [
+                        'post_id' => $post->id,
+                        'post_title' => $post->title,
+                        'message' => 'Your post has been deleted by an administrator.',
+                        'deleted_by' => Auth::user()->name,
+                        'deleted_at' => now()->toISOString(),
+                    ]
+                );
+            }
+            
+            // Delete the post
+            $post->delete();
+
+            DB::commit();
+
+            return ResponseHelper::success(null, 'Post deleted successfully by admin');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ResponseHelper::error('Post not found', 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::error('Failed to delete post', 500, $e->getMessage());
+        }
+    }
 }

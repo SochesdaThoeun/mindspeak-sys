@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import logo from "@/assets/logo9.png";
+import logo from "@/assets/logo8.png";
+import logo2 from "@/assets/logo9.png";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // Redux imports
@@ -18,18 +19,18 @@ import { loginUser, registerUser, clearError } from "@/store/slices/authSlice";
 import { LoginPayload, RegisterPayload } from "@/store/types/auth";
 
 interface AuthPageProps {
-  initialMode?: 'login' | 'signup';
+  initialMode?: "login" | "signup";
 }
 
-export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
+export default function AuthPage({ initialMode = "login" }: AuthPageProps) {
   const router = useRouter();
-  
+
   // Redux hooks
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading, error } = useAuth();
 
   // State management
-  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+  const [isLogin, setIsLogin] = useState(initialMode === "login");
   const [showPassword, setShowPassword] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [loginData, setLoginData] = useState({
@@ -56,16 +57,16 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
   // Redirect if user is already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log("✅ User authenticated, redirecting...", { 
-        userName: user.name, 
-        userRole: user.role 
+      console.log("✅ User authenticated, redirecting...", {
+        userName: user.name,
+        userRole: user.role,
       });
-      
+
       // Redirect based on user role
-      if (user.role === 'admin') {
-        router.push('/admin-dashboard');
+      if (user.role === "admin") {
+        router.push("/admin-dashboard");
       } else {
-        router.push('/user-dashboard');
+        router.push("/user-dashboard");
       }
     }
   }, [isAuthenticated, user, router]);
@@ -91,7 +92,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (isLogin) {
         // Login flow
@@ -99,7 +100,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
           email: loginData.email,
           password: loginData.password,
         };
-        
+
         console.log("🔐 Attempting login with:", { email: loginPayload.email });
         await dispatch(loginUser(loginPayload)).unwrap();
         console.log("✅ Login successful");
@@ -113,17 +114,17 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
           bio: "", // Optional bio, can be empty
           is_anonymous: signupData.isAnonymous || false, // Ensure it's always a boolean
         };
-        
-        console.log("📝 Attempting registration with:", { 
-          name: registerPayload.name, 
+
+        console.log("📝 Attempting registration with:", {
+          name: registerPayload.name,
           email: registerPayload.email,
-          isAnonymous: registerPayload.is_anonymous
+          isAnonymous: registerPayload.is_anonymous,
         });
         await dispatch(registerUser(registerPayload)).unwrap();
         console.log("✅ Registration successful");
       }
     } catch (error: unknown) {
-      console.error(`❌ ${isLogin ? 'Login' : 'Registration'} failed:`, error);
+      console.error(`❌ ${isLogin ? "Login" : "Registration"} failed:`, error);
       // Error is automatically handled by Redux and will show in the UI
     }
   };
@@ -152,13 +153,13 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
       </div>
 
       <div className="relative z-10 flex items-center justify-between mb-3 sm:mb-4">
-      <Image
-            src={logo}
-            width={80}
-            height={80}
-            alt="Logo"
-            className="w-16 h-16 lg:w-20 animate-pulse lg:h-20 object-contain brightness-125"
-          />
+        <Image
+          src={logo2}
+          width={80}
+          height={80}
+          alt="Logo"
+          className="w-16 h-16 lg:w-20 lg:h-20 object-contain brightness-125"
+        />
         <Link href={isLogin ? "/auth/signup" : "/auth/login"} passHref>
           <Button
             variant="ghost"
@@ -225,15 +226,6 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
           <div className="text-white font-bold text-2xl tracking-wider">
             MINDSPEAK
           </div>
-          <Link href={isLogin ? "/auth/signup" : "/auth/login"} passHref>
-            <Button
-              variant="ghost"
-              className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 dark:text-black/80 dark:hover:text-black dark:hover:bg-black/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {isLogin ? "Back to sign up" : "Back to sign in"}
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -242,7 +234,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
         <div className="relative">
           <div className="absolute inset-0 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
           <Image
-            src={logo}
+            src={logo2}
             width={200}
             height={200}
             alt="Form Illustration"
@@ -275,7 +267,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
 
   return (
     <div className="min-h-screen bg-[#1d2b7d] flex items-center justify-center p-2 sm:p-4">
-      <div className="w-full max-w-6xl bg-slate-800/30 backdrop-blur-xl rounded-2xl lg:rounded-3xl shadow-xl shadow-black overflow-hidden border border-slate-700/30">
+      <div className="w-full max-w-6xl bg-slate-800/30 backdrop-blur-xl rounded-2xl lg:rounded-3xl shadow-xl shadow-slate-800 overflow-hidden border border-slate-700/30">
         {/* Mobile Header */}
         <MobileHeader />
 
@@ -287,7 +279,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
             }`}
           >
             {/* Form Panel */}
-            <div className="w-full lg:w-1/2 p-3 sm:p-4 lg:p-8 xl:p-12 bg-black lg:backdrop-blur-sm">
+            <div className="w-full lg:w-1/2 p-3 sm:p-4 lg:p-8 xl:p-12 bg-white lg:backdrop-blur-sm">
               <div
                 className={`max-w-md mx-auto transition-all duration-300 ${
                   isAnimating
@@ -303,7 +295,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       width={80}
                       height={80}
                       alt="Logo"
-                      className="w-16 h-16 lg:w-20 animate-pulse lg:h-20 object-contain brightness-125"
+                      className="w-16 h-16 lg:w-20 brightness-125 lg:h-20 object-contain"
                     />
                   </div>
                 </div>
@@ -316,37 +308,47 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       width={50}
                       height={50}
                       alt="Logo"
-                      className="w-12 h-12 sm:w-16 animate-pulse sm:h-16 object-contain brightness-125"
+                      className="w-12 h-12 sm:w-16 sm:h-16 object-contain brightness-125"
                     />
                   </div>
                 </div>
 
                 {/* Header */}
                 <div className="mb-4 sm:mb-6 lg:mb-8 text-center">
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
-                    {isLogin ? "Welcome back" : "Create an account"}
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#1d2b7d] mb-2">
+                    {isLogin
+                      ? "Welcome Back To Mindspeak"
+                      : "Create an account"}
                   </h2>
-                  <p className="text-slate-400 text-xs sm:text-sm lg:text-base">
+                  <p className="text-gray-700 text-xs sm:text-sm lg:text-base">
                     {isLogin
                       ? "Don't have an account? "
                       : "Already have an account? "}
                     <button
                       type="button"
                       onClick={switchMode}
-                      className="text-indigo-400 hover:text-indigo-300 underline font-medium transition-colors duration-200"
+                      className="text-blue-700 hover:text-blue-500 underline font-medium transition-colors duration-200"
                       disabled={isAnimating || isLoading}
                     >
                       {isLogin ? "Sign up" : "Log in"}
                     </button>
                   </p>
-                  
+
                   {/* Error Display Banner */}
                   {error && (
                     <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg backdrop-blur-sm">
                       <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0">
-                          <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          <svg
+                            className="w-5 h-5 text-red-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -362,7 +364,10 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                                 </p>
                                 <ul className="space-y-1">
                                   {error.map((errorMessage, index) => (
-                                    <li key={index} className="text-red-400 text-sm flex items-start">
+                                    <li
+                                      key={index}
+                                      className="text-red-400 text-sm flex items-start"
+                                    >
                                       <span className="mr-2 mt-1.5 w-1 h-1 bg-red-400 rounded-full flex-shrink-0"></span>
                                       {errorMessage}
                                     </li>
@@ -379,7 +384,6 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       </div>
                     </div>
                   )}
-
                 </div>
 
                 {/* Forms */}
@@ -393,7 +397,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     <div className="space-y-2">
                       <Label
                         htmlFor="login-email"
-                        className="text-slate-300 text-sm font-medium"
+                        className="text-slate-600 text-sm font-medium"
                       >
                         Email
                       </Label>
@@ -405,7 +409,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                         onChange={(e) =>
                           handleLoginChange("email", e.target.value)
                         }
-                        className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500"
+                        className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                         required
                       />
                     </div>
@@ -415,13 +419,13 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       <div className="flex items-center justify-between">
                         <Label
                           htmlFor="login-password"
-                          className="text-slate-300 text-sm font-medium"
+                          className="text-slate-600 text-sm font-medium"
                         >
                           Password
                         </Label>
-                        <Link 
+                        <Link
                           href="/auth/forgot-password"
-                          className="text-xs sm:text-sm text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+                          className="text-xs sm:text-sm text-blue-700 hover:text-blue-500 transition-colors duration-200"
                         >
                           Forgot?
                         </Link>
@@ -435,14 +439,14 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                           onChange={(e) =>
                             handleLoginChange("password", e.target.value)
                           }
-                          className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base pr-12 rounded-xl transition-all duration-200 hover:border-slate-500"
+                          className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                           required
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-2 top-1/2 -translate-y-1/2  text-slate-400 hover:bg-blur hover:text-white h-10 w-10 sm:h-12 sm:w-12 rounded-lg transition-all duration-200"
+                          className="absolute right-2 top-1/2 -translate-y-1/2  text-slate-400 hover:bg-blur hover:text-slate-600 h-10 w-10 sm:h-12 sm:w-12 rounded-lg transition-all duration-200"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -462,11 +466,11 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                         onCheckedChange={(checked) =>
                           handleLoginChange("rememberMe", checked as boolean)
                         }
-                        className="border-slate-600 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 data-[state=checked]:text-white h-4 w-4 sm:h-5 sm:w-5 rounded-md transition-all duration-200"
+                        className="border-slate-600 data-[state=checked]:bg-[#1d2b7d] data-[state=checked]:border-[#1d2b7d] data-[state=checked]:text-white h-4 w-4 sm:h-5 sm:w-5 rounded-md transition-all duration-200"
                       />
                       <Label
                         htmlFor="remember"
-                        className="text-slate-300 text-xs sm:text-sm"
+                        className="text-slate-600 text-xs sm:text-sm"
                       >
                         Remember me for 30 days
                       </Label>
@@ -477,7 +481,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-white text-[#1d2b7d] hover:bg-[#1d2b7d] hover:text-white font-semibold py-2.5 sm:py-3 h-11 sm:h-12 rounded-xl text-sm sm:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        className="w-full bg-[#1d2b7d] text-white hover:bg-[#1d2b7d] border border-gray-700/20 hover:text-white font-semibold py-2.5 sm:py-3 h-11 sm:h-12 rounded-xl text-sm sm:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
                         {isLoading ? "Signing in..." : "Sign in"}
                       </Button>
@@ -494,7 +498,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                       <div className="space-y-2">
                         <Label
                           htmlFor="firstName"
-                          className="text-slate-300 text-sm font-medium"
+                          className="text-slate-600 text-sm font-medium"
                         >
                           First name
                         </Label>
@@ -506,14 +510,14 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                           onChange={(e) =>
                             handleSignupChange("firstName", e.target.value)
                           }
-                          className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500"
+                          className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                           required
                         />
                       </div>
                       <div className="space-y-2">
                         <Label
                           htmlFor="lastName"
-                          className="text-slate-300 text-sm font-medium"
+                          className="text-slate-600 text-sm font-medium"
                         >
                           Last name
                         </Label>
@@ -525,7 +529,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                           onChange={(e) =>
                             handleSignupChange("lastName", e.target.value)
                           }
-                          className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500"
+                          className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                           required
                         />
                       </div>
@@ -535,7 +539,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     <div className="space-y-2">
                       <Label
                         htmlFor="signup-email"
-                        className="text-slate-300 text-sm font-medium"
+                        className="text-slate-600 text-sm font-medium"
                       >
                         Email
                       </Label>
@@ -547,7 +551,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                         onChange={(e) =>
                           handleSignupChange("email", e.target.value)
                         }
-                        className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500"
+                        className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                         required
                       />
                     </div>
@@ -556,7 +560,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     <div className="space-y-2">
                       <Label
                         htmlFor="signup-password"
-                        className="text-slate-300 text-sm font-medium"
+                        className="text-slate-600 text-sm font-medium"
                       >
                         Password
                       </Label>
@@ -569,14 +573,14 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                           onChange={(e) =>
                             handleSignupChange("password", e.target.value)
                           }
-                          className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 h-11 sm:h-12 text-sm sm:text-base pr-12 rounded-xl transition-all duration-200 hover:border-slate-500"
+                          className="bg-slate-300/20 border-slate-500/30 text-gray-800 placeholder:text-slate-500 focus:border-white focus:ring-white h-11 sm:h-12 text-sm sm:text-base rounded-xl transition-all duration-200 hover:border-slate-500/20"
                           required
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-blur h-10 w-10 sm:h-12 sm:w-12 rounded-lg transition-all duration-200"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hover:bg-blur h-10 w-10 sm:h-12 sm:w-12 rounded-lg transition-all duration-200"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -596,11 +600,11 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                         onCheckedChange={(checked) =>
                           handleSignupChange("isAnonymous", checked as boolean)
                         }
-                        className="border-slate-600 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 data-[state=checked]:text-white h-4 w-4 sm:h-5 sm:w-5 rounded-md transition-all duration-200 mt-0.5"
+                        className="border-slate-600 data-[state=checked]:bg-[#1d2b7d] data-[state=checked]:border-[#1d2b7d] data-[state=checked]:text-white h-4 w-4 sm:h-5 sm:w-5 rounded-md transition-all duration-200 mt-0.5"
                       />
                       <Label
                         htmlFor="anonymous"
-                        className="text-slate-300 text-xs sm:text-sm leading-relaxed"
+                        className="text-slate-600 text-xs sm:text-sm leading-relaxed"
                       >
                         Remain Anonymous
                       </Label>
@@ -610,7 +614,7 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     <div className="pt-2">
                       <Button
                         type="submit"
-                        className="w-full bg-white text-[#1d2b7d] hover:bg-[#1d2b7d] hover:text-white font-semibold py-2.5 sm:py-3 h-11 sm:h-12 rounded-xl text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:transform-none"
+                        className="w-full bg-[#1d2b7d] text-white hover:bg-[#1d2b7d] border border-gray-700/20 hover:text-white font-semibold py-2.5 sm:py-3 h-11 sm:h-12 rounded-xl text-sm sm:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         disabled={isLoading}
                       >
                         {isLoading ? "Creating account..." : "Create account"}
@@ -618,8 +622,6 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
                     </div>
                   </form>
                 )}
-
-
               </div>
             </div>
 
