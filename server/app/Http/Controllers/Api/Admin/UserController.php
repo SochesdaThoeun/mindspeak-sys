@@ -347,4 +347,56 @@ class UserController extends Controller
             return ResponseHelper::error('Failed to perform bulk action', 500, $e->getMessage());
         }
     }
+
+    /**
+     * Update admin's own password.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updatePassword(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'old_password' => 'required|string',
+                'new_password' => 'required|string|min:8|confirmed',
+                'new_password_confirmation' => 'required|string'
+            ]);
+
+            $admin = $request->user();
+
+            // Verify old password
+            if (!Hash::check($validated['old_password'], $admin->password)) {
+                return ResponseHelper::error('The old password is incorrect', 400, [
+                    'old_password' => ['The provided password does not match your current password.']
+                ]);
+            }
+
+            // Check if new password is different from old password
+            if (Hash::check($validated['new_password'], $admin->password)) {
+                return ResponseHelper::error('New password must be different from current password', 400, [
+                    'new_password' => ['The new password must be different from your current password.']
+                ]);
+            }
+
+            // Update password
+            $admin->update([
+                'password' => Hash::make($validated['new_password'])
+            ]);
+
+            return ResponseHelper::success([
+                'id' => $admin->id,
+                'name' => $admin->is_anonymous ? "Anonymous #{$admin->id}" : $admin->name,
+                'email' => $admin->email,
+                'updated_at' => $admin->updated_at
+            ], 'Password updated successfully');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ResponseHelper::validationError($e->errors(), 'Validation failed');
+        } catch (\Exception $e) {
+            return ResponseHelper::error('Failed to update password', 500, [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 } 

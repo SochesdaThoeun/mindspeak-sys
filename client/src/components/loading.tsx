@@ -226,7 +226,7 @@ export default function LoadingScreen() {
         }
         return prev + 1
       })
-    }, 80)
+    }, 30)
 
     return () => clearInterval(interval)
   }, [])
@@ -238,8 +238,8 @@ export default function LoadingScreen() {
         setFadeOut(true)
         setTimeout(() => {
           setLoading(false)
-        }, 1000)
-      }, 500)
+        }, 700)
+      }, 200)
 
       return () => clearTimeout(timer)
     }

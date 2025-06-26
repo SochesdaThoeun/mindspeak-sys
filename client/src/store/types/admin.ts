@@ -347,6 +347,7 @@ export interface AdminState {
     fetchPostStatistics: boolean;
     approvePost: boolean;
     rejectPost: boolean;
+    deletePost: boolean;
     
     // Comment Management
     fetchAllComments: boolean;
@@ -373,6 +374,9 @@ export interface AdminState {
     // Tag Management
     createTag: boolean;
     deleteTag: boolean;
+    
+    // Password Management
+    updatePassword: boolean;
   };
   
   // Error handling
@@ -476,6 +480,23 @@ export interface BulkUserActionResponse {
   data: {
     affected_users: number;
     details: string;
+  };
+}
+
+export interface UpdateAdminPasswordPayload {
+  old_password: string;
+  new_password: string;
+  new_password_confirmation: string;
+}
+
+export interface UpdateAdminPasswordResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: number;
+    name: string;
+    email: string;
+    updated_at: string;
   };
 }
 
@@ -902,6 +923,7 @@ export const initialAdminState: AdminState = {
     fetchPostStatistics: false,
     approvePost: false,
     rejectPost: false,
+    deletePost: false,
 
     // Comment Management
     fetchAllComments: false,
@@ -928,6 +950,9 @@ export const initialAdminState: AdminState = {
     // Tag Management
     createTag: false,
     deleteTag: false,
+    
+    // Password Management
+    updatePassword: false,
     fetchUserMessages: undefined
   },
   

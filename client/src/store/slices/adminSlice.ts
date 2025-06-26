@@ -18,6 +18,7 @@ import {
   SetAdminUserFiltersPayload,
   GetAllUsersParams,
   GetAllPostsParams,
+  UpdateAdminPasswordPayload,
 } from '../types/admin';
 import * as adminService from '../services/adminService';
 
@@ -273,6 +274,25 @@ export const rejectPost = createAsyncThunk(
   }
 );
 
+/**
+ * Delete a post permanently
+ */
+export const deletePost = createAsyncThunk(
+  'admin/deletePost',
+  async (postId: number, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Deleting post...', postId);
+      const response = await adminService.deletePost(postId);
+      console.log('✅ [Admin] Post deleted successfully:', response);
+      return { postId, response };
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error deleting post:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to delete post');
+    }
+  }
+);
+
 // ============================================================================
 // ASYNC THUNKS - COMMENT MANAGEMENT
 // ============================================================================
@@ -414,6 +434,25 @@ export const fetchAdminStats = createAsyncThunk(
       const apiError = error as ApiError;
       console.error('❌ [Admin] Error fetching admin statistics:', apiError);
       return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to fetch admin statistics');
+    }
+  }
+);
+
+/**
+ * Update admin password
+ */
+export const updateAdminPassword = createAsyncThunk(
+  'admin/updateAdminPassword',
+  async (payload: UpdateAdminPasswordPayload, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Updating admin password...');
+      const response = await adminService.updateAdminPassword(payload);
+      console.log('✅ [Admin] Admin password updated successfully:', response);
+      return response;
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error updating admin password:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to update admin password');
     }
   }
 );
@@ -751,6 +790,28 @@ const adminSlice = createSlice({
       })
 
     // ========================================================================
+    // DELETE POST
+    // ========================================================================
+      .addCase(deletePost.pending, (state) => {
+        state.loading.deletePost = true;
+        state.error = null;
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.loading.deletePost = false;
+        // Remove from all post arrays
+        const postId = action.payload.postId;
+        state.pendingPosts = state.pendingPosts.filter(post => post.id !== postId);
+        state.approvedPosts = state.approvedPosts.filter(post => post.id !== postId);
+        state.rejectedPosts = state.rejectedPosts.filter(post => post.id !== postId);
+        state.allPosts = state.allPosts.filter(post => post.id !== postId);
+        state.error = null;
+      })
+      .addCase(deletePost.rejected, (state, action) => {
+        state.loading.deletePost = false;
+        state.error = action.payload as string;
+      })
+
+    // ========================================================================
     // PENDING COMMENTS
     // ========================================================================
       .addCase(fetchPendingComments.pending, (state) => {
@@ -888,6 +949,22 @@ const adminSlice = createSlice({
       })
       .addCase(updateMessageStatus.rejected, (state, action) => {
         state.loading.updateMessageStatus = false;
+        state.error = action.payload as string;
+      })
+
+    // ========================================================================
+    // UPDATE PASSWORD
+    // ========================================================================
+      .addCase(updateAdminPassword.pending, (state) => {
+        state.loading.updatePassword = true;
+        state.error = null;
+      })
+      .addCase(updateAdminPassword.fulfilled, (state) => {
+        state.loading.updatePassword = false;
+        state.error = null;
+      })
+      .addCase(updateAdminPassword.rejected, (state, action) => {
+        state.loading.updatePassword = false;
         state.error = action.payload as string;
       });
   },

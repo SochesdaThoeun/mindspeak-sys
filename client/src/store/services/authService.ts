@@ -4,7 +4,9 @@ import {
   RegisterPayload,
   AuthResponse,
   UserProfileResponse,
-  UpdateProfilePayload
+  UpdateProfilePayload,
+  UpdatePasswordPayload,
+  UpdatePasswordResponse
 } from '../types/auth'
 
 // Authentication service functions
@@ -191,15 +193,16 @@ export const authService = {
       
       if (response.data.success) {
         console.log('✅ Auth Service: Profile fetched successfully', {
-          userId: response.data.data.user.id,
-          userName: response.data.data.user.name
+          userId: response.data.data.id,
+          userName: response.data.data.name,
+          responseStructure: 'response.data.data contains user directly'
         })
       }
       
       return {
         success: response.data.success,
         data: {
-          user: response.data.data.user
+          user: response.data.data
         }
       }
     } catch (error: unknown) {
@@ -222,46 +225,77 @@ export const authService = {
     }
   },
 
-  // Update user profile
+    // Update user profile
   updateUserProfile: async (payload: UpdateProfilePayload): Promise<UserProfileResponse> => {
     try {
       console.log('🔐 Auth Service: Updating user profile', {
         hasName: !!payload.name,
         hasBio: !!payload.bio,
-        hasAvatar: !!payload.avatar
+        hasAvatar: !!payload.avatar,
+        willUseFormData: !!payload.avatar
       })
       
-      // Handle FormData for file uploads
-      const formData = new FormData()
+      let response;
       
-      if (payload.name) {
-        formData.append('name', payload.name)
-      }
-      if (payload.bio !== undefined) {
-        formData.append('bio', payload.bio)
-      }
       if (payload.avatar) {
-        formData.append('avatar', payload.avatar)
-        console.log('📎 Auth Service: Avatar file attached for profile update')
-      }
-
-      const response = await api.put('/user/profile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        // Use FormData only when there's a file upload
+        const formData = new FormData()
+        
+        if (payload.name) {
+          formData.append('name', payload.name)
         }
-      })
+        if (payload.bio !== undefined) {
+          formData.append('bio', payload.bio)
+        }
+        formData.append('avatar', payload.avatar)
+        
+        console.log('📎 Auth Service: Using FormData for file upload')
+        
+        response = await api.put('/user/profile', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      } else {
+        // Use JSON when no file upload
+        const jsonPayload: Record<string, string> = {}
+        
+        if (payload.name) {
+          jsonPayload.name = payload.name
+        }
+        if (payload.bio !== undefined) {
+          jsonPayload.bio = payload.bio
+        }
+        
+        console.log('📤 Auth Service: Using JSON payload', jsonPayload)
+        
+        response = await api.put('/user/profile', jsonPayload, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+      }
       
       if (response.data.success) {
         console.log('✅ Auth Service: Profile updated successfully', {
-          userId: response.data.data.user.id,
-          userName: response.data.data.user.name
+          userId: response.data.data.id,
+          userName: response.data.data.name,
+          userBio: response.data.data.bio?.substring(0, 50) + (response.data.data.bio?.length > 50 ? '...' : ''),
+          hasAvatar: !!response.data.data.avatar,
+          avatarUrl: response.data.data.avatar,
+          responseStructure: {
+            success: response.data.success,
+            hasUserData: !!response.data.data,
+            userKeys: Object.keys(response.data.data || {}),
+            actualStructure: 'response.data.data contains user directly'
+          }
         })
       }
       
       return {
         success: response.data.success,
         data: {
-          user: response.data.data.user
+          user: response.data.data
         }
       }
     } catch (error: unknown) {
@@ -289,17 +323,60 @@ export const authService = {
     }
   },
 
+  // Update user password
+  updatePassword: async (payload: UpdatePasswordPayload): Promise<UpdatePasswordResponse> => {
+    try {
+      console.log('🔐 Auth Service: Updating user password')
+      
+      const response = await api.put('/user/password', payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (response.data.success) {
+        console.log('✅ Auth Service: Password updated successfully', {
+          message: response.data.message
+        })
+      }
+      
+      return response.data
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: Record<string, unknown>; status?: number }; message?: string }
+      console.error('❌ Auth Service: Failed to update password', {
+        error: err.response?.data || err.message,
+        status: err.response?.status
+      })
+      
+      // Re-throw with more specific error information
+      const errorMessage = err.response?.data?.message || 'Failed to update password'
+      const validationErrors = err.response?.data?.errors
+      
+      throw {
+        ...err,
+        response: {
+          ...err.response,
+          data: {
+            success: false,
+            message: errorMessage,
+            errors: validationErrors
+          }
+        }
+      }
+    }
+  },
+
   // Check authentication status
   checkAuthStatus: async (): Promise<boolean> => {
     try {
       console.log('🔐 Auth Service: Checking authentication status')
       
       const response = await api.get('/user/profile')
-      const isAuthenticated = response.data.success && !!response.data.data.user
+      const isAuthenticated = response.data.success && !!response.data.data
       
       console.log('✅ Auth Service: Auth status checked', {
         isAuthenticated,
-        userId: isAuthenticated ? response.data.data.user.id : null
+        userId: isAuthenticated ? response.data.data.id : null
       })
       
       return isAuthenticated

@@ -320,13 +320,13 @@ api.interceptors.response.use(
       // Clear all auth data
       clearAllAuthData()
       
-      // Redirect to login if not already on auth pages
+      // Redirect to home if not already on auth pages
       if (typeof window !== 'undefined') {
         const pathname = window.location.pathname
         if (!pathname.includes('/login') && !pathname.includes('/auth') && !pathname.includes('/testing')) {
-          console.log('🔄 API: Redirecting to login page after unauthorized error')
+          console.log('🔄 API: Redirecting to home page after unauthorized error')
           setTimeout(() => {
-            window.location.href = '/login'
+            window.location.href = '/'
           }, 100)
         }
       }

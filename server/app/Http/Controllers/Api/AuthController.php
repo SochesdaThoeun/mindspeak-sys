@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Models\User;
 use App\Utils\ResponseHelper;
 use App\Utils\ImageUploader;
@@ -326,6 +327,38 @@ class AuthController extends Controller
             return ResponseHelper::validationError($e->errors(), 'Validation failed');
         } catch (\Exception $e) {
             return ResponseHelper::error('Failed to update settings: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Update user password
+     *
+     * @param UpdatePasswordRequest $request
+     * @return JsonResponse
+     */
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $validatedData = $request->validated();
+
+            // Update password
+            $user->password = Hash::make($validatedData['password']);
+            $user->save();
+
+            // Optionally revoke all tokens except current one for security
+            $currentToken = $user->currentAccessToken();
+            $user->tokens()->where('id', '!=', $currentToken->id)->delete();
+
+            return ResponseHelper::updated(
+                ['message' => 'Password updated successfully'],
+                'Password updated successfully. All other sessions have been logged out for security.'
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ResponseHelper::validationError($e->errors(), 'Password update validation failed');
+        } catch (\Exception $e) {
+            return ResponseHelper::error('Failed to update password: ' . $e->getMessage(), 500);
         }
     }
 }

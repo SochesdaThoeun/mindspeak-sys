@@ -17,6 +17,7 @@ export interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | string[] | null
+  lastUpdated?: number
 }
 
 // API Request/Response payloads
@@ -55,6 +56,20 @@ export interface UpdateProfilePayload {
   name?: string
   bio?: string
   avatar?: File
+}
+
+export interface UpdatePasswordPayload {
+  current_password: string
+  password: string
+  password_confirmation: string
+}
+
+export interface UpdatePasswordResponse {
+  success: boolean
+  message: string
+  data: {
+    message: string
+  }
 }
 
 // Error response interface

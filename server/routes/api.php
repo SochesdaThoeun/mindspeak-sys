@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user/profile', [AuthController::class, 'profile']);
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::put('/user/password', [AuthController::class, 'updatePassword']);
     Route::get('/user/settings', [AuthController::class, 'settings']);
     Route::put('/user/settings', [AuthController::class, 'updateSettings']);
     
@@ -117,6 +118,7 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
     Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy']);
     Route::get('/admin/users/{id}/statistics', [AdminUserController::class, 'statistics']);
     Route::post('/admin/users/bulk-action', [AdminUserController::class, 'bulkAction']);
+    Route::put('/admin/password', [AdminUserController::class, 'updatePassword']);
 
     // ===== POST MANAGEMENT =====
     Route::get('/admin/posts', [AdminPostController::class, 'index']);

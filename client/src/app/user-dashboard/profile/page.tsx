@@ -13,6 +13,8 @@ import {
   MessageSquare,
   Shield,
   User,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +24,7 @@ import { useAppDispatch, useAuth } from "@/store/hooks";
 import { 
   getUserProfile, 
   updateUserProfile, 
+  updateUserPassword,
   logoutUser, 
   clearError 
 } from "@/store/slices/authSlice";
@@ -46,6 +49,11 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  // Password visibility states
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form states - initialize with Redux user data
   const [userData, setUserData] = useState({
@@ -77,6 +85,8 @@ export default function ProfilePage() {
     twoFactorEnabled: false,
   });
 
+  const [passwordUpdateSuccess, setPasswordUpdateSuccess] = useState(false);
+
   // Load user profile on component mount
   useEffect(() => {
     if (!currentUser) {
@@ -87,14 +97,23 @@ export default function ProfilePage() {
   // Update form data when user data changes
   useEffect(() => {
     if (currentUser) {
+      console.log('🔄 Profile Page: Syncing form data with current user', {
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userBio: currentUser.bio ? currentUser.bio.substring(0, 50) + (currentUser.bio.length > 50 ? '...' : '') : 'No bio'
+      });
+      
       setUserData({
         name: currentUser.name || "",
         email: currentUser.email || "",
         bio: currentUser.bio || "",
-        avatar: null,
+        avatar: null, // Always reset avatar file input
       });
+      
       // Reset avatar error when user data changes
       setAvatarError(false);
+      
+      console.log('✅ Profile Page: Form data synced with Redux user state');
     }
   }, [currentUser]);
 
@@ -158,50 +177,101 @@ export default function ProfilePage() {
 
       // Only update if there are changes
       if (Object.keys(updatePayload).length > 0) {
-        await dispatch(updateUserProfile(updatePayload)).unwrap();
+        console.log('🔄 Profile Page: Submitting profile update', updatePayload);
+        
+        // Dispatch the update and wait for completion
+        const result = await dispatch(updateUserProfile(updatePayload)).unwrap();
+        console.log('✅ Profile Page: Profile update successful', result);
+        
+        // Force refresh user data from Redux store to ensure UI sync
+        await dispatch(getUserProfile()).unwrap();
+        console.log('✅ Profile Page: User profile refreshed after update');
+        
+        // Show success message
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
+        
+        // Exit editing mode
         setIsEditing(false);
-        setUserData(prev => ({ ...prev, avatar: null })); // Reset avatar file input
+        
+        // Reset avatar file input only (form data will be updated by useEffect)
+        setUserData(prev => ({ ...prev, avatar: null }));
+        
+        console.log('✅ Profile Page: Form state reset after successful update');
       } else {
+        console.log('ℹ️ Profile Page: No changes detected, exiting edit mode');
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error('❌ Profile Page: Failed to update profile:', error);
+      // Error will be shown via Redux error state
     }
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous success message
+    setPasswordUpdateSuccess(false);
+    
     // Validate passwords
     if (securityData.newPassword !== securityData.confirmPassword) {
-      alert("Passwords don&apos;t match!");
+      dispatch(clearError());
+      setTimeout(() => {
+        // Set a temporary error in the auth state
+        console.error("Passwords don't match!");
+      }, 100);
       return;
     }
     if (securityData.newPassword.length < 8) {
-      alert("Password must be at least 8 characters!");
+      dispatch(clearError());
+      setTimeout(() => {
+        console.error("Password must be at least 8 characters!");
+      }, 100);
       return;
     }
 
-    // TODO: Implement password update endpoint in authService
-    // For now, simulate password update
-    alert("Password update functionality will be available in a future update.");
-    setSecurityData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-      twoFactorEnabled: securityData.twoFactorEnabled,
-    });
+    try {
+      console.log('🔄 Profile Page: Submitting password update');
+      
+      // Dispatch the password update
+      await dispatch(updateUserPassword({
+        current_password: securityData.currentPassword,
+        password: securityData.newPassword,
+        password_confirmation: securityData.confirmPassword
+      })).unwrap();
+      
+      console.log('✅ Profile Page: Password update successful');
+      
+      // Show success message
+      setPasswordUpdateSuccess(true);
+      setTimeout(() => setPasswordUpdateSuccess(false), 5000);
+      
+      // Clear the form
+      setSecurityData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+        twoFactorEnabled: securityData.twoFactorEnabled,
+      });
+      
+      console.log('✅ Profile Page: Password form cleared after successful update');
+    } catch (error) {
+      console.error('❌ Profile Page: Failed to update password:', error);
+      // Error will be shown via Redux error state
+    }
   };
 
   const handleLogout = async () => {
     try {
-      await dispatch(logoutUser()).unwrap();
-      router.push("/auth/login");
+      console.log("🚪 Profile Page: Starting logout process")
+      await dispatch(logoutUser()).unwrap()
+      console.log("✅ Profile Page: Logout successful, redirecting to home")
+      router.push("/")
     } catch (error) {
-      console.error('Logout failed:', error);
-      // Even if logout fails, redirect to login
-      router.push("/auth/login");
+      console.error("❌ Profile Page: Logout failed", error)
+      // Still redirect to home even if logout fails on server
+      router.push("/")
     }
   };
 
@@ -233,9 +303,9 @@ export default function ProfilePage() {
     );
   }
 
-  // Redirect to login if no user data
+  // Redirect to home if no user data
   if (!currentUser && !isLoading) {
-    router.push("/auth/login");
+    router.push("/");
     return null;
   }
 
@@ -295,7 +365,6 @@ export default function ProfilePage() {
             <motion.div
               className="bg-white rounded-xl shadow-md p-6"
               whileHover={{ boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-              transition={{ duration: 0.3 }}
             >
               <form onSubmit={handleProfileSubmit}>
                 <div className="flex justify-between items-center mb-4">
@@ -786,35 +855,99 @@ export default function ProfilePage() {
               <h3 className="text-xl font-semibold text-gray-800 mb-4">
                 Password
               </h3>
+              
+              {passwordUpdateSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+                  role="alert"
+                >
+                  <strong className="font-bold">Success!</strong>
+                  <span className="block sm:inline">
+                    {" "}
+                    Your password has been updated successfully.
+                  </span>
+                </motion.div>
+              )}
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                  role="alert"
+                >
+                  <strong className="font-bold">Error!</strong>
+                  <span className="block sm:inline">
+                    {" "}
+                    {Array.isArray(error) ? error.join(", ") : error}
+                  </span>
+                  <button
+                    onClick={() => dispatch(clearError())}
+                    className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                  >
+                    ×
+                  </button>
+                </motion.div>
+              )}
+              
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     Current Password
                   </label>
-                  <Input
-                    type="password"
-                    name="currentPassword"
-                    value={securityData.currentPassword}
-                    onChange={handleSecurityChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showCurrentPassword ? "text" : "password"}
+                      name="currentPassword"
+                      value={securityData.currentPassword}
+                      onChange={handleSecurityChange}
+                      className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
+                      placeholder="••••••••"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     New Password
                   </label>
-                  <Input
-                    type="password"
-                    name="newPassword"
-                    value={securityData.newPassword}
-                    onChange={handleSecurityChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
-                    placeholder="••••••••"
-                    required
-                    minLength={8}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showNewPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={securityData.newPassword}
+                      onChange={handleSecurityChange}
+                      className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
+                      placeholder="••••••••"
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      )}
+                    </button>
+                  </div>
                   <p className="text-xs text-gray-500 mt-1">
                     Password must be at least 8 characters long
                   </p>
@@ -823,15 +956,28 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     Confirm New Password
                   </label>
-                  <Input
-                    type="password"
-                    name="confirmPassword"
-                    value={securityData.confirmPassword}
-                    onChange={handleSecurityChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={securityData.confirmPassword}
+                      onChange={handleSecurityChange}
+                      className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#1d2b7d] focus:outline-none"
+                      placeholder="••••••••"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <motion.div
                   className="mt-6"
@@ -841,11 +987,12 @@ export default function ProfilePage() {
                 >
                   <motion.button
                     type="submit"
-                    className="bg-[#1d2b7d] hover:bg-[#162058] text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    disabled={isLoading}
+                    className="bg-[#1d2b7d] hover:bg-[#162058] text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                    whileTap={{ scale: isLoading ? 1 : 0.95 }}
                   >
-                    Update Password
+                    {isLoading ? "Updating..." : "Update Password"}
                   </motion.button>
                 </motion.div>
               </form>

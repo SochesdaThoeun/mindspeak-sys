@@ -5,6 +5,7 @@ import {
   LoginPayload,
   RegisterPayload,
   UpdateProfilePayload,
+  UpdatePasswordPayload,
   User
 } from '../types/auth'
 
@@ -167,6 +168,22 @@ export const updateUserProfile = createAsyncThunk(
   }
 )
 
+export const updateUserPassword = createAsyncThunk(
+  'auth/updatePassword',
+  async (payload: UpdatePasswordPayload, { rejectWithValue }) => {
+    try {
+      console.log('📤 Auth Slice: Updating user password')
+      const response = await authService.updatePassword(payload)
+      return response.data.message
+    } catch (error: unknown) {
+      const apiError = error as ApiError
+      console.error('❌ Auth Slice: Update password failed', apiError.response?.data || apiError.message)
+      const errorMessages = extractErrorMessages(apiError)
+      return rejectWithValue({ errors: errorMessages })
+    }
+  }
+)
+
 export const refreshUserData = createAsyncThunk(
   'auth/refreshUserData',  
   async (_, { rejectWithValue }) => {
@@ -211,6 +228,17 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload
       console.log('✅ Auth Slice: User data updated', { userId: action.payload.id, userName: action.payload.name })
+    },
+    // Force update user in persisted state
+    forceUpdateUser: (state, action: PayloadAction<User>) => {
+      state.user = { ...action.payload }
+      // Force a timestamp update to trigger persistence
+      state.lastUpdated = Date.now()
+      console.log('🔄 Auth Slice: Force user update with timestamp', { 
+        userId: action.payload.id, 
+        userName: action.payload.name,
+        timestamp: state.lastUpdated
+      })
     }
   },
   extraReducers: (builder) => {
@@ -347,10 +375,18 @@ const authSlice = createSlice({
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.isLoading = false
-        state.user = action.payload
+        const previousUser = state.user
+        
+        // Force deep update to trigger persistence
+        state.user = { ...action.payload }
+        state.lastUpdated = Date.now()
         state.error = null
+        
         console.log('✅ Auth Slice: Update profile successful', {
-          user: action.payload.name
+          previousUser: previousUser ? { id: previousUser.id, name: previousUser.name, bio: previousUser.bio?.substring(0, 30) + '...' } : null,
+          updatedUser: { id: action.payload.id, name: action.payload.name, bio: action.payload.bio?.substring(0, 30) + '...' },
+          userChanged: previousUser?.name !== action.payload.name || previousUser?.bio !== action.payload.bio,
+          lastUpdated: state.lastUpdated
         })
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
@@ -358,6 +394,26 @@ const authSlice = createSlice({
         const payload = action.payload as { message?: string; errors?: string[] } | undefined;
         state.error = payload?.errors || [payload?.message || 'Failed to update profile'];
         console.log('❌ Auth Slice: Update profile rejected', state.error)
+      })
+
+    // Update user password
+    builder
+      .addCase(updateUserPassword.pending, (state) => {
+        state.isLoading = true
+        console.log('⏳ Auth Slice: Update password pending')
+      })
+      .addCase(updateUserPassword.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.error = null
+        console.log('✅ Auth Slice: Update password successful', {
+          message: action.payload
+        })
+      })
+      .addCase(updateUserPassword.rejected, (state, action) => {
+        state.isLoading = false
+        const payload = action.payload as { message?: string; errors?: string[] } | undefined;
+        state.error = payload?.errors || [payload?.message || 'Failed to update password'];
+        console.log('❌ Auth Slice: Update password rejected', state.error)
       })
 
     // Refresh user data
@@ -381,7 +437,7 @@ const authSlice = createSlice({
 })
 
 // Export actions
-export const { clearError, clearAuth, setLoading, setUser } = authSlice.actions
+export const { clearError, clearAuth, setLoading, setUser, forceUpdateUser } = authSlice.actions
 
 // Export reducer
 export default authSlice.reducer 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Check, Clock, Eye, ExternalLink, ImageIcon, MoreHorizontal, User, X } from "lucide-react"
+import { Check, Clock, Eye, ExternalLink, ImageIcon, MoreHorizontal, User, X, Trash } from "lucide-react"
 import Image from "next/image"
 import type { Confession } from "./types/confession"
 import { getStatusColor, formatDate } from "./utils/helper"
@@ -16,6 +16,7 @@ interface ConfessionCardsProps {
   onSelectionChange: (ids: number[]) => void
   onStatusChange: (id: number, status: "approved" | "rejected") => void
   onView: (confession: Confession) => void
+  onDelete: (id: number) => void
 }
 
 export function ConfessionCards({
@@ -24,6 +25,7 @@ export function ConfessionCards({
   onSelectionChange,
   onStatusChange,
   onView,
+  onDelete,
 }: ConfessionCardsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
@@ -130,6 +132,13 @@ export function ConfessionCards({
                           Reject with Reason
                         </DropdownMenuItem>
                       )}
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => onDelete(confession.id)}
+                      >
+                        <Trash className="h-4 w-4 mr-2" />
+                        Delete Post
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

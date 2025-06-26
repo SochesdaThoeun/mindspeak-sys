@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   X,
   ImageIcon,
+  Trash,
 } from "lucide-react"
 import Image from "next/image"
 import type { Confession } from "./types/confession"
@@ -23,6 +24,7 @@ interface ConfessionTableModernProps {
   onSelectAll: (checked: boolean) => void
   onStatusChange: (id: number, status: "approved" | "rejected") => void
   onView: (confession: Confession) => void
+  onDelete: (id: number) => void
 }
 
 export function ConfessionTableModern({
@@ -32,6 +34,7 @@ export function ConfessionTableModern({
   onSelectAll,
   onStatusChange,
   onView,
+  onDelete,
 }: ConfessionTableModernProps) {
   const allSelected = confessions.length > 0 && selectedConfessions.length === confessions.length
   const someSelected = selectedConfessions.length > 0 && selectedConfessions.length < confessions.length
@@ -215,6 +218,13 @@ export function ConfessionTableModern({
                             Reject with Reason
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => onDelete(confession.id)}
+                        >
+                          <Trash className="h-4 w-4 mr-2" />
+                          Delete Post
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

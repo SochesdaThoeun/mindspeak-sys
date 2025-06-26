@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Check, ExternalLink, X, Calendar, MessageSquare, Hash, User, MessageCircle } from "lucide-react"
+import { Check, ExternalLink, X, Calendar, MessageSquare, Hash, User, MessageCircle, Trash } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import type { Confession } from "./types/confession"
@@ -14,9 +14,10 @@ interface ConfessionModalProps {
   isOpen: boolean
   onClose: () => void
   onStatusChange: (id: number, status: "approved" | "rejected") => void
+  onDelete: (id: number) => void
 }
 
-export function ConfessionModal({ confession, isOpen, onClose, onStatusChange }: ConfessionModalProps) {
+export function ConfessionModal({ confession, isOpen, onClose, onStatusChange, onDelete }: ConfessionModalProps) {
   if (!confession) return null
 
   const dateInfo = formatDate(confession.timeConfession)
@@ -197,6 +198,16 @@ export function ConfessionModal({ confession, isOpen, onClose, onStatusChange }:
                       Reject with Reason
                     </Button>
                   )}
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all"
+                    onClick={() => {
+                      onDelete(confession.id);
+                      onClose();
+                    }}
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete Post
+                  </Button>
                 </div>
               </div>
             </div>

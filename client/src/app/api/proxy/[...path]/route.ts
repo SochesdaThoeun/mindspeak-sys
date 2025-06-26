@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const BACKEND_URL = process.env.BACKEND_URL ?? 'https://api.mindspeak.xyz/api'
 
+
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 async function proxyRequest(

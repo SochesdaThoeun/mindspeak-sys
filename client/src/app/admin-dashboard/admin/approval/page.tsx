@@ -12,6 +12,7 @@ import {
   X,
   Grid3X3,
   List,
+  Trash,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { 
@@ -22,10 +23,12 @@ import {
   fetchDashboardOverview,
   approvePost,
   rejectPost,
+  deletePost,
   setPostFilters
 } from "@/store/slices/adminSlice";
 import { RejectionReasonModal } from "./rejection-reason-modal";
 import { ApprovalConfirmationModal } from "./approval-confirmation-modal";
+import { DeleteConfirmationModal } from "./delete-confirmation-modal";
 import { Post } from "@/store/types/post";
 import { ConfessionTableModern } from "./confession-table-modern";
 import { ConfessionCards } from "./confession-cards";
@@ -104,6 +107,11 @@ export default function PostManagementDashboard() {
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
   const [postToApprove, setPostToApprove] = useState<number | null>(null);
   const [isBulkApproval, setIsBulkApproval] = useState(false);
+  
+  // Delete modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<number | null>(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -293,6 +301,50 @@ export default function PostManagementDashboard() {
       setIsRejectionModalOpen(true);
     }
   }, []);
+
+  const handleDelete = useCallback(async (id: number) => {
+    // Open delete confirmation modal
+    setPostToDelete(id);
+    setIsBulkDelete(false);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  // Handle delete confirmation
+  const handleDeleteConfirmation = useCallback(async () => {
+    if (!postToDelete && !isBulkDelete) {
+      return;
+    }
+    
+    try {
+      if (isBulkDelete) {
+        // Handle bulk deletion
+        await Promise.all(
+          selectedPosts.map(id => dispatch(deletePost(id)).unwrap())
+        );
+        setSelectedPosts([]);
+      } else {
+        // Handle single post deletion
+        await dispatch(deletePost(postToDelete!)).unwrap();
+      }
+      
+      // Refresh data after deletion
+      dispatch(fetchDashboardOverview());
+      
+      // If we're on a specific tab and this was the last item, go back to page 1
+      if (activeTab !== "all" && paginatedConfessions.length === 1 && currentPage > 1) {
+        setCurrentPage(1);
+      } else {
+        refreshPostsData();
+      }
+      
+      // Close the delete modal
+      setIsDeleteModalOpen(false);
+      setPostToDelete(null);
+      setIsBulkDelete(false);
+    } catch (error: unknown) {
+      console.error("Failed to delete post:", error);
+    }
+  }, [dispatch, postToDelete, isBulkDelete, selectedPosts, refreshPostsData, activeTab, paginatedConfessions.length, currentPage]);
   
   // Handle approval with optional note
   const handleApproveConfirmation = useCallback(async () => {
@@ -384,6 +436,15 @@ export default function PostManagementDashboard() {
     setIsBulkRejection(true);
     setPostToReject(null);
     setIsRejectionModalOpen(true);
+  }, [selectedPosts]);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedPosts.length === 0) return;
+    
+    // Open delete modal for bulk deletion
+    setIsBulkDelete(true);
+    setPostToDelete(null);
+    setIsDeleteModalOpen(true);
   }, [selectedPosts]);
 
   const handleSelectAll = useCallback((checked: boolean) => {
@@ -673,6 +734,16 @@ export default function PostManagementDashboard() {
                     <X className="h-4 w-4 mr-1" />
                     Reject with Reason ({selectedPosts.length})
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleBulkDelete}
+                    disabled={loading.deletePost}
+                    className="bg-red-600 hover:bg-red-700 text-white flex-1 sm:flex-none"
+                  >
+                    <Trash className="h-4 w-4 mr-1" />
+                    Delete ({selectedPosts.length})
+                  </Button>
                 </div>
               )}
             </div>
@@ -713,6 +784,7 @@ export default function PostManagementDashboard() {
               onSelectAll={handleSelectAll}
               onStatusChange={handleStatusChange}
               onView={handleView}
+              onDelete={handleDelete}
             />
           ) : (
             <ConfessionCards
@@ -721,6 +793,7 @@ export default function PostManagementDashboard() {
               onSelectionChange={setSelectedPosts}
               onStatusChange={handleStatusChange}
               onView={handleView}
+              onDelete={handleDelete}
             />
           )}
         </div>
@@ -798,6 +871,7 @@ export default function PostManagementDashboard() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
         />
       </div>
 
@@ -825,6 +899,19 @@ export default function PostManagementDashboard() {
         onSubmit={handleApproveConfirmation}
         isBulk={isBulkApproval}
         isLoading={loading.approvePost}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setPostToDelete(null);
+          setIsBulkDelete(false);
+        }}
+        onConfirm={handleDeleteConfirmation}
+        isBulk={isBulkDelete}
+        isLoading={loading.deletePost}
       />
     </div>
   );

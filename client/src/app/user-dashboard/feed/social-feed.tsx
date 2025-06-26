@@ -80,6 +80,10 @@ export default function SocialFeed() {
   // Success state for post creation
   const [postSuccess, setPostSuccess] = useState<string | null>(null)
   
+  // Timeout refs to manage auto-dismiss timers
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
   // Error states for likes and comments
   const [likeError, setLikeError] = useState<string | null>(null)
   const [commentError] = useState<Record<number, string>>({})
@@ -177,13 +181,32 @@ export default function SocialFeed() {
     if (node) observer.current.observe(node)
   }, [isLoading, isLoadingMore, hasMore, page, dispatch])
 
-  // Clear errors when user starts typing or making changes
+  // Clear ONLY errors when user starts typing or making changes (not success)
   useEffect(() => {
     if (postError || validationErrors) {
+      // Clear any pending error timeouts
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current)
+        errorTimeoutRef.current = null
+      }
+      
+      // Clear error states only
       setPostError(null)
       setValidationErrors(null)
     }
   }, [newPostTitle, newPostText, selectedImage, selectedLink, hashtags, postError, validationErrors])
+
+  // Cleanup timeouts on component unmount
+  useEffect(() => {
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current)
+      }
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -228,9 +251,16 @@ export default function SocialFeed() {
     }
 
     setIsCreating(true)
+    
+    // Clear any previous errors (but keep success if it exists)
     setPostError(null)
     setValidationErrors(null)
-    setPostSuccess(null)
+    
+    // Clear any existing error timeout
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current)
+      errorTimeoutRef.current = null
+    }
     
     try {
       const postData = {
@@ -255,9 +285,22 @@ export default function SocialFeed() {
       setIsHashtagInputVisible(false)
       removeImage()
       
+      // Clear any existing success timeout
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current)
+        successTimeoutRef.current = null
+      }
+      
+      // Clear any existing errors when showing success
+      setPostError(null)
+      setValidationErrors(null)
+      
       // Set success message
       setPostSuccess("Post created successfully!")
-      setTimeout(() => setPostSuccess(null), 5000)
+      successTimeoutRef.current = setTimeout(() => {
+        setPostSuccess(null)
+        successTimeoutRef.current = null
+      }, 5000)
       
       // Refresh posts to get updated data
       const response = await dispatch(getPublicPosts({ page: 1 })).unwrap()
@@ -284,16 +327,41 @@ export default function SocialFeed() {
         const fieldNames = Object.keys(err.errors)
         const errorMessage = `Please fix the following issues: ${fieldNames.join(', ')}`
         setPostError(errorMessage)
+        
+        // Auto-dismiss validation errors after 10 seconds (longer than success since user needs to read them)
+        errorTimeoutRef.current = setTimeout(() => {
+          setPostError(null)
+          setValidationErrors(null)
+          errorTimeoutRef.current = null
+        }, 10000)
       } else if (err?.message) {
         // Handle general error message
         setPostError(err.message)
         setValidationErrors(null)
+        
+        // Auto-dismiss general errors after 5 seconds
+        errorTimeoutRef.current = setTimeout(() => {
+          setPostError(null)
+          errorTimeoutRef.current = null
+        }, 5000)
       } else if (typeof error === 'string') {
         setPostError(error)
         setValidationErrors(null)
+        
+        // Auto-dismiss string errors after 5 seconds
+        errorTimeoutRef.current = setTimeout(() => {
+          setPostError(null)
+          errorTimeoutRef.current = null
+        }, 5000)
       } else {
         setPostError("Failed to create post. Please try again.")
         setValidationErrors(null)
+        
+        // Auto-dismiss generic errors after 5 seconds
+        errorTimeoutRef.current = setTimeout(() => {
+          setPostError(null)
+          errorTimeoutRef.current = null
+        }, 5000)
       }
     } finally {
       setIsCreating(false)
@@ -470,7 +538,7 @@ export default function SocialFeed() {
 
       {/* Post Creation Error Display */}
       {(postError || validationErrors) && (
-        <Card className="border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+        <Card className="border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 sticky top-0 z-10">
           <CardContent className="p-4">
             <div className="flex items-start space-x-2">
               <div className="flex-shrink-0">

@@ -7,6 +7,7 @@ import {
   Menu,
   LogOut,
   ChevronDown,
+  Key,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -34,6 +35,8 @@ import { logoutUser } from "@/store/slices/authSlice";
 // Notification Redux imports
 import { useNotifications } from "@/store/hooks";
 import { fetchNotifications, markAllAsRead, fetchUnreadCount } from "@/store/slices/notificationSlice";
+// Change Password Modal
+import { AdminChangePasswordModal } from "./admin-change-password-modal";
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -48,6 +51,7 @@ export function Navbar({
   sidebarCollapsed,
 }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const router = useRouter();
   
   // Redux hooks
@@ -323,8 +327,14 @@ export function Navbar({
                   </p>
                 </div>
               </DropdownMenuLabel>
-              {/* Dark Mode Toggle */}
               <DropdownMenuSeparator className="bg-white/30" />
+              <DropdownMenuItem
+                onClick={() => setIsChangePasswordModalOpen(true)}
+                className="px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900 text-blue-600 focus:text-blue-600 rounded-lg mx-2 my-1"
+              >
+                <Key className="mr-3 h-4 w-4" />
+                <span>Change Password</span>
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900 text-red-600 focus:text-red-600 rounded-lg mx-2 my-1"
@@ -336,6 +346,12 @@ export function Navbar({
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      <AdminChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+      />
     </motion.div>
   );
 }

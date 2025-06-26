@@ -1,4 +1,5 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
 import type { RootState, AppDispatch } from '../index'
 import { AuthState } from '../types/auth'
 import { PostState } from '../types/post'
@@ -11,6 +12,19 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 // Custom hooks for auth
 export const useAuth = () => {
   const auth = useAppSelector((state) => state.auth) as unknown as AuthState
+  
+  // Debug logging to track state changes
+  useEffect(() => {
+    console.log('🔍 useAuth Hook: Auth state changed', {
+      hasUser: !!auth?.user,
+      userId: auth?.user?.id,
+      userName: auth?.user?.name,
+      isAuthenticated: auth?.isAuthenticated,
+      isLoading: auth?.isLoading,
+      hasError: !!auth?.error
+    })
+  }, [auth?.user, auth?.isAuthenticated, auth?.isLoading, auth?.error])
+  
   return {
     user: auth?.user || null,
     token: auth?.token || null,

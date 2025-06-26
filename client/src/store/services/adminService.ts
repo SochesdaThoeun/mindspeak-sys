@@ -49,6 +49,10 @@ import {
   
   // FAQ Management
   GetFaqStatisticsResponse,
+  
+  // Password Management
+  UpdateAdminPasswordPayload,
+  UpdateAdminPasswordResponse,
 } from '../types/admin';
 
 /**
@@ -218,6 +222,15 @@ export const approvePost = async ({ postId, admin_note }: ApprovePostPayload): P
  */
 export const rejectPost = async ({ postId, admin_note, reason }: RejectPostPayload): Promise<RejectPostResponse> => {
   const response = await api.put(`/admin/posts/${postId}/reject`, { admin_note, reason });
+  return response.data;
+};
+
+/**
+ * Delete a post permanently
+ * DELETE /api/admin/posts/{id}
+ */
+export const deletePost = async (postId: number): Promise<{ success: boolean; message: string }> => {
+  const response = await api.delete(`/admin/posts/${postId}`);
   return response.data;
 };
 
@@ -433,4 +446,17 @@ export const bulkRejectComments = async (commentIds: number[], admin_note?: stri
   } catch (error) {
     throw error;
   }
+};
+
+// ============================================================================
+// PASSWORD MANAGEMENT ENDPOINTS
+// ============================================================================
+
+/**
+ * Update admin password
+ * PUT /api/admin/password
+ */
+export const updateAdminPassword = async (payload: UpdateAdminPasswordPayload): Promise<UpdateAdminPasswordResponse> => {
+  const response = await api.put('/admin/password', payload);
+  return response.data;
 }; 
