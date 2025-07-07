@@ -14,7 +14,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
-import user from "@/assets/user.jpg"
 import logo8 from "@/assets/logo8.png"
 
 // Redux imports
@@ -633,7 +632,7 @@ export default function SocialFeed() {
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.src} alt="User" />
+              <AvatarImage src={logo8.src} alt="User" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex-1">

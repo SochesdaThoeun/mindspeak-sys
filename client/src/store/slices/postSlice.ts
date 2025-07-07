@@ -238,6 +238,23 @@ const postSlice = createSlice({
       state.userPosts = []
       state.publicPostsPagination = null
       state.userPostsPagination = null
+    },
+    // Reset posts for fresh pagination (useful when filters change)
+    resetPosts: (state) => {
+      state.publicPosts = []
+      state.userPosts = []
+      state.publicPostsPagination = null
+      state.userPostsPagination = null
+      state.userPostsByStatus = {
+        pending: [],
+        approved: [],
+        rejected: []
+      }
+      state.userPostsByStatusPagination = {
+        pending: null,
+        approved: null,
+        rejected: null
+      }
     }
   },
   extraReducers: (builder) => {
@@ -250,7 +267,14 @@ const postSlice = createSlice({
       })
       .addCase(getPublicPosts.fulfilled, (state, action) => {
         state.isLoading = false
-        state.publicPosts = action.payload.data
+        
+        // If it's the first page, replace the posts; otherwise, append
+        if (action.payload.current_page === 1) {
+          state.publicPosts = action.payload.data
+        } else {
+          state.publicPosts = [...state.publicPosts, ...action.payload.data]
+        }
+        
         state.publicPostsPagination = {
           current_page: action.payload.current_page,
           last_page: action.payload.last_page,
@@ -262,7 +286,9 @@ const postSlice = createSlice({
         state.error = null
         console.log('✅ Post Slice: Get public posts successful', {
           count: action.payload.data.length,
-          total: action.payload.total
+          total: action.payload.total,
+          currentPage: action.payload.current_page,
+          totalPosts: state.publicPosts.length
         })
       })
       .addCase(getPublicPosts.rejected, (state, action) => {
@@ -444,7 +470,14 @@ const postSlice = createSlice({
       })
       .addCase(getUserPosts.fulfilled, (state, action) => {
         state.isLoading = false
-        state.userPosts = action.payload.data.data
+        
+        // If it's the first page, replace the posts; otherwise, append
+        if (action.payload.data.current_page === 1) {
+          state.userPosts = action.payload.data.data
+        } else {
+          state.userPosts = [...state.userPosts, ...action.payload.data.data]
+        }
+        
         state.userPostsPagination = {
           current_page: action.payload.data.current_page,
           last_page: action.payload.data.last_page,
@@ -456,7 +489,9 @@ const postSlice = createSlice({
         state.error = null
         console.log('✅ Post Slice: Get user posts successful', {
           count: action.payload.data.data.length,
-          status: action.payload.params?.status || 'all'
+          status: action.payload.params?.status || 'all',
+          currentPage: action.payload.data.current_page,
+          totalPosts: state.userPosts.length
         })
       })
       .addCase(getUserPosts.rejected, (state, action) => {
@@ -476,7 +511,14 @@ const postSlice = createSlice({
       .addCase(getUserPostsByStatus.fulfilled, (state, action) => {
         const { status } = action.payload
         state.isLoadingByStatus[status] = false
-        state.userPostsByStatus[status] = action.payload.data.data
+        
+        // If it's the first page, replace the posts; otherwise, append
+        if (action.payload.data.current_page === 1) {
+          state.userPostsByStatus[status] = action.payload.data.data
+        } else {
+          state.userPostsByStatus[status] = [...state.userPostsByStatus[status], ...action.payload.data.data]
+        }
+        
         state.userPostsByStatusPagination[status] = {
           current_page: action.payload.data.current_page,
           last_page: action.payload.data.last_page,
@@ -488,7 +530,9 @@ const postSlice = createSlice({
         state.error = null
         console.log('✅ Post Slice: Get user posts by status successful', {
           count: action.payload.data.data.length,
-          status
+          status,
+          currentPage: action.payload.data.current_page,
+          totalPosts: state.userPostsByStatus[status].length
         })
       })
       .addCase(getUserPostsByStatus.rejected, (state, action) => {
@@ -507,7 +551,14 @@ const postSlice = createSlice({
       })
       .addCase(getAllUserPosts.fulfilled, (state, action) => {
         state.isLoading = false
-        state.userPosts = action.payload.data.data
+        
+        // If it's the first page, replace the posts; otherwise, append
+        if (action.payload.data.current_page === 1) {
+          state.userPosts = action.payload.data.data
+        } else {
+          state.userPosts = [...state.userPosts, ...action.payload.data.data]
+        }
+        
         state.userPostsPagination = {
           current_page: action.payload.data.current_page,
           last_page: action.payload.data.last_page,
@@ -518,7 +569,9 @@ const postSlice = createSlice({
         }
         state.error = null
         console.log('✅ Post Slice: Get all user posts successful', {
-          count: action.payload.data.data.length
+          count: action.payload.data.data.length,
+          currentPage: action.payload.data.current_page,
+          totalPosts: state.userPosts.length
         })
       })
       .addCase(getAllUserPosts.rejected, (state, action) => {
@@ -530,7 +583,7 @@ const postSlice = createSlice({
 })
 
 // Export actions
-export const { clearError, setFilters, clearCurrentPost, clearPosts } = postSlice.actions
+export const { clearError, setFilters, clearCurrentPost, clearPosts, resetPosts } = postSlice.actions
 
 // Export reducer
 export default postSlice.reducer 

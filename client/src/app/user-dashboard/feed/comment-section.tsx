@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Textarea } from "@/components/ui/textarea"
 import type { Comment } from "@/store/types/comment"
 import { usePostComments, useAppDispatch, getPostComments } from "@/store/hooks"
-import user from "@/assets/user.jpg"
+import user from "@/assets/logo8.png"
 
 interface CommentSectionProps {
   postId: string

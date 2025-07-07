@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import logo from "@/assets/logo8.png"
-import { BookOpen, GraduationCap, Lightbulb, Atom } from "lucide-react"
+import { BookOpen, GraduationCap, Lightbulb, Atom } from 'lucide-react'
 
 export default function LoadingScreen() {
   const [loading, setLoading] = useState(true)
@@ -67,7 +67,7 @@ export default function LoadingScreen() {
           }
 
           star.style.opacity = `${Math.random() * 0.5 + 0.5}`
-          star.style.animation = `twinkle ${Math.random() * 8 + 4}s ease-in-out infinite`
+          star.style.animation = `twinkle ${Math.random() * 4 + 2}s ease-in-out infinite`
           star.style.animationDelay = `${Math.random() * 5}s`
 
           container.appendChild(star)
@@ -85,7 +85,7 @@ export default function LoadingScreen() {
         star.style.left = `${Math.random() * 100}%`
         star.style.top = `${Math.random() * 70}%`
         star.style.opacity = `${Math.random() * 0.7 + 0.3}`
-        star.style.animation = `twinkle ${Math.random() * 5 + 3}s ease-in-out infinite`
+        star.style.animation = `twinkle ${Math.random() * 2.5 + 1.5}s ease-in-out infinite`
         star.style.animationDelay = `${Math.random() * 5}s`
 
         container.appendChild(star)
@@ -169,7 +169,7 @@ export default function LoadingScreen() {
             line.style.top = `${y1}%`
             line.style.transformOrigin = "0 0"
             line.style.transform = `rotate(${angle}deg)`
-            line.style.animation = `constellationLine 8s ease-in-out infinite`
+            line.style.animation = `constellationLine 4s ease-in-out infinite`
             line.style.animationDelay = `${patternIndex * 0.5}s`
 
             container.appendChild(line)
@@ -199,7 +199,7 @@ export default function LoadingScreen() {
         particle.style.top = `${Math.random() * 100}%`
 
         // Animation
-        particle.style.animation = `floatParticle ${Math.random() * 20 + 20}s ease-in-out infinite`
+        particle.style.animation = `floatParticle ${Math.random() * 10 + 10}s ease-in-out infinite`
         particle.style.animationDelay = `${Math.random() * 10}s`
 
         container.appendChild(particle)
@@ -209,7 +209,7 @@ export default function LoadingScreen() {
     // Rotate through educational quotes
     const quoteInterval = setInterval(() => {
       setCurrentQuote((prev) => (prev + 1) % educationalQuotes.length)
-    }, 5000)
+    }, 2500)
 
     return () => {
       clearInterval(quoteInterval)
@@ -226,7 +226,8 @@ export default function LoadingScreen() {
         }
         return prev + 1
       })
-    }, 30)
+    }, 40)
+
 
     return () => clearInterval(interval)
   }, [])
@@ -400,7 +401,7 @@ export default function LoadingScreen() {
               <div className="relative z-10 p-2 rounded-full">
                 <div className="absolute inset-0 rounded-full bg-[#ffff] animate-pulse-slow" />
                 <Image
-                  src={logo}
+                  src={logo || "/placeholder.svg"}
                   alt="Logo"
                   width={100}
                   height={100}
@@ -656,23 +657,23 @@ export default function LoadingScreen() {
         }
         
         .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
+          animation: spin-slow 10s linear infinite;
         }
         
         .animate-spin-slow-reverse {
-          animation: spin-slow-reverse 20s linear infinite;
+          animation: spin-slow-reverse 10s linear infinite;
         }
         
         .animate-spin-medium {
-          animation: spin-medium 15s linear infinite;
+          animation: spin-medium 7.5s linear infinite;
         }
         
         .animate-spin-medium-reverse {
-          animation: spin-medium-reverse 15s linear infinite;
+          animation: spin-medium-reverse 7.5s linear infinite;
         }
         
         .animate-pulse-slow {
-          animation: pulse-slow 3s ease-in-out infinite;
+          animation: pulse-slow 1.5s ease-in-out infinite;
         }
       `}</style>
     </div>

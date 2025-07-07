@@ -170,7 +170,7 @@ export default function SinglePostView() {
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="mb-4"
+          className="mb-4 bg-[#1d2b7d] text-white hover:bg-white hover:text-[#1d2b7d] shadow-md shadow-gray-800/80 hover:shadow-md hover:shadow-[#1d2b7d]" 
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Feed
