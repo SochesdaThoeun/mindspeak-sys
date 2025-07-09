@@ -51,10 +51,42 @@ export default function FaqPage() {
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
     
-    // For now, we'll use a simple keyword-based category filter since the API FAQ model doesn't have category field
+    // Enhanced category filtering based on FAQ content
     const categoryMatch = activeCategory === "all" || 
-      faq.question.toLowerCase().includes(activeCategory) ||
-      faq.answer.toLowerCase().includes(activeCategory)
+      (activeCategory === "counseling" && (
+        faq.question.toLowerCase().includes("counsel") ||
+        faq.question.toLowerCase().includes("therapy") ||
+        faq.question.toLowerCase().includes("professional") ||
+        faq.answer.toLowerCase().includes("counsel") ||
+        faq.answer.toLowerCase().includes("therapy") ||
+        faq.answer.toLowerCase().includes("professional")
+      )) ||
+      (activeCategory === "support" && (
+        faq.question.toLowerCase().includes("support") ||
+        faq.question.toLowerCase().includes("help") ||
+        faq.question.toLowerCase().includes("community") ||
+        faq.answer.toLowerCase().includes("support") ||
+        faq.answer.toLowerCase().includes("help") ||
+        faq.answer.toLowerCase().includes("community")
+      )) ||
+      (activeCategory === "resources" && (
+        faq.question.toLowerCase().includes("resource") ||
+        faq.question.toLowerCase().includes("information") ||
+        faq.question.toLowerCase().includes("app") ||
+        faq.answer.toLowerCase().includes("resource") ||
+        faq.answer.toLowerCase().includes("information") ||
+        faq.answer.toLowerCase().includes("app")
+      )) ||
+      (activeCategory === "emergency" && (
+        faq.question.toLowerCase().includes("emergency") ||
+        faq.question.toLowerCase().includes("crisis") ||
+        faq.question.toLowerCase().includes("harm") ||
+        faq.question.toLowerCase().includes("suicide") ||
+        faq.answer.toLowerCase().includes("emergency") ||
+        faq.answer.toLowerCase().includes("crisis") ||
+        faq.answer.toLowerCase().includes("harm") ||
+        faq.answer.toLowerCase().includes("suicide")
+      ))
     
     return searchMatch && categoryMatch
   })

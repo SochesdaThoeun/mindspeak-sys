@@ -137,12 +137,8 @@ export interface MessageStatistics {
 
 export interface FaqStatistics {
   total_faqs: number;
-  views_last_week: number;
-  most_viewed: Array<{
-    id: number;
-    question: string;
-    views: number;
-  }>;
+  recent_faqs: number;
+  latest_faq: FAQ;
 }
 
 // Admin State Interface
@@ -178,6 +174,14 @@ export interface AdminState {
   // FAQ Management
   faqs: FAQ[];
   faqStatistics: FaqStatistics | null;
+  faqPagination: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+  } | null;
   
   // Tag Management
   tags: TagModel[];
@@ -366,6 +370,7 @@ export interface AdminState {
     updateMessageStatus: boolean;
     
     // FAQ Management
+    fetchAllFaqs: boolean;
     fetchFaqStatistics: boolean;
     createFaq: boolean;
     updateFaq: boolean;
@@ -653,6 +658,97 @@ export interface AdminReplyToMessageResponse {
 // FAQ MANAGEMENT PAYLOADS
 // ============================================================================
 
+export interface GetAllFaqsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: 'latest' | 'oldest' | 'question_asc' | 'question_desc';
+}
+
+export interface GetAllFaqsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    current_page: number;
+    data: FAQ[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: {
+      first: string;
+      last: string;
+      prev: string | null;
+      next: string | null;
+    };
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
+  meta: {
+    stats: {
+      total_faqs: number;
+      recent_faqs: number;
+      latest_faq: FAQ;
+    };
+    filters: {
+      search: string | null;
+      sort: string;
+      limit: number;
+      page: number;
+    };
+  };
+}
+
+export interface CreateFaqPayload {
+  question: string;
+  answer: string;
+}
+
+export interface CreateFaqResponse {
+  success: boolean;
+  message: string;
+  data: FAQ;
+  meta?: {
+    total_faqs: number;
+  };
+}
+
+export interface UpdateFaqPayload {
+  faqId: number;
+  question?: string;
+  answer?: string;
+}
+
+export interface UpdateFaqResponse {
+  success: boolean;
+  message: string;
+  data: FAQ;
+}
+
+export interface DeleteFaqResponse {
+  success: boolean;
+  message: string;
+  data: {
+    deleted_faq: {
+      id: number;
+      question: string;
+      deleted_at: string;
+    };
+    deleted_by: {
+      id: number;
+      name: string;
+      role: string;
+    };
+  };
+  meta?: {
+    total_faqs: number;
+  };
+}
+
 export interface GetFaqStatisticsResponse {
   success: boolean;
   message: string;
@@ -859,6 +955,7 @@ export const initialAdminState: AdminState = {
   // FAQ Management
   faqs: [],
   faqStatistics: null,
+  faqPagination: null,
   
   // Tag Management
   tags: [],
@@ -942,6 +1039,7 @@ export const initialAdminState: AdminState = {
     updateMessageStatus: false,
 
     // FAQ Management
+    fetchAllFaqs: false,
     fetchFaqStatistics: false,
     createFaq: false,
     updateFaq: false,

@@ -48,6 +48,13 @@ import {
   AdminReplyToMessageResponse,
   
   // FAQ Management
+  GetAllFaqsParams,
+  GetAllFaqsResponse,
+  CreateFaqPayload,
+  CreateFaqResponse,
+  UpdateFaqPayload,
+  UpdateFaqResponse,
+  DeleteFaqResponse,
   GetFaqStatisticsResponse,
   
   // Password Management
@@ -362,6 +369,42 @@ export const replyToMessage = async ({ messageId, content }: AdminReplyToMessage
 // ============================================================================
 // FAQ MANAGEMENT ENDPOINTS
 // ============================================================================
+
+/**
+ * Get all FAQs with pagination and filtering
+ * GET /api/faqs
+ */
+export const getAllFaqs = async (params: GetAllFaqsParams = {}): Promise<GetAllFaqsResponse> => {
+  const response = await api.get('/faqs', { params });
+  return response.data;
+};
+
+/**
+ * Create a new FAQ
+ * POST /api/faqs
+ */
+export const createFaq = async (payload: CreateFaqPayload): Promise<CreateFaqResponse> => {
+  const response = await api.post('/faqs', payload);
+  return response.data;
+};
+
+/**
+ * Update an existing FAQ
+ * PUT /api/faqs/{id}
+ */
+export const updateFaq = async ({ faqId, ...payload }: UpdateFaqPayload): Promise<UpdateFaqResponse> => {
+  const response = await api.put(`/faqs/${faqId}`, payload);
+  return response.data;
+};
+
+/**
+ * Delete a FAQ
+ * DELETE /api/faqs/{id}
+ */
+export const deleteFaq = async (faqId: number): Promise<DeleteFaqResponse> => {
+  const response = await api.delete(`/faqs/${faqId}`);
+  return response.data;
+};
 
 /**
  * Get FAQ statistics

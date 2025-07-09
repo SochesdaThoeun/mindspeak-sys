@@ -5,7 +5,21 @@ export * from './notification'
 export * from './comment'
 export * from './like'
 export * from './tag'
-export * from './faq'
+
+// Export FAQ types except the conflicting ones that are also in admin.ts
+export type {
+  FAQ,
+  FaqPagination,
+  FaqState,
+  GetFaqsParams,
+  GetFaqsResponse,
+  DeleteFaqResponse,
+  SetFaqFiltersPayload,
+  FaqItemProps,
+  FaqListProps,
+  FaqFormProps,
+  initialFaqState
+} from './faq'
 
 // Export message types except the conflicting one
 export type {

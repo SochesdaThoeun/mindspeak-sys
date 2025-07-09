@@ -26,18 +26,23 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DialogFooter } from "@/components/ui/dialog"
-
-interface FAQ {
-  id: number
-  question: string
-  answer: string
-  created_at: string
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { fetchAllFaqs, createFaq, updateFaq, deleteFaq } from "@/store/slices/adminSlice"
+import { FAQ } from "@/store/types/faq"
 
 export default function FAQManagement() {
   const { toast } = useToast()
-  const [loading, setLoading] = useState(true)
-  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const dispatch = useAppDispatch()
+  
+  // Redux state
+  const { faqs, loading, faqPagination, faqStatistics } = useAppSelector((state) => ({
+    faqs: state.admin.faqs,
+    loading: state.admin.loading,
+    faqPagination: state.admin.faqPagination,
+    faqStatistics: state.admin.faqStatistics
+  }))
+
+  // Local state
   const [searchTerm, setSearchTerm] = useState("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -46,107 +51,83 @@ export default function FAQManagement() {
   const [newQuestion, setNewQuestion] = useState("")
   const [newAnswer, setNewAnswer] = useState("")
 
+  // Fetch FAQs on component mount
   useEffect(() => {
-    // Mock data for demonstration purposes
-    const mockFaqs: FAQ[] = [
-      {
-        id: 1,
-        question: "How do I create a post?",
-        answer: "To create a post, you need to be logged in and click the 'Create Post' button...",
-        created_at: "2024-01-15T08:00:00.000000Z"
-      },
-      {
-        id: 2,
-        question: "Why is my post pending approval?",
-        answer: "All posts go through a moderation process to ensure they meet our community guidelines...",
-        created_at: "2024-01-15T08:00:00.000000Z"
-      },
-      {
-        id: 3,
-        question: "How long does post approval take?",
-        answer: "Post approval typically takes 12-24 hours during business days.",
-        created_at: "2024-01-15T16:30:00.000000Z"
-      },
-      {
-        id: 4,
-        question: "Can I edit my post after submitting it?",
-        answer: "Yes, you can edit your post if it's still pending approval or has been rejected. Once approved, you cannot edit it.",
-        created_at: "2024-02-10T09:15:00.000000Z"
-      },
-      {
-        id: 5,
-        question: "How do I delete my account?",
-        answer: "To delete your account, go to your profile settings and select the 'Delete Account' option. Note that this action is irreversible.",
-        created_at: "2024-02-15T14:20:00.000000Z"
-      },
-    ]
+    dispatch(fetchAllFaqs({}))
+  }, [dispatch])
 
-    // Simulate API fetch
-    setTimeout(() => {
-      setFaqs(mockFaqs)
-      setLoading(false)
-    }, 1000)
-  }, [])
-
+  // Filter FAQs based on search term
   const filteredFaqs = faqs.filter(
     (faq) =>
       faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleCreateFaq = () => {
-    // Simulate API call
-    const newFaq: FAQ = {
-      id: faqs.length + 1,
-      question: newQuestion,
-      answer: newAnswer,
-      created_at: new Date().toISOString()
+  // Handle creating a new FAQ
+  const handleCreateFaq = async () => {
+    try {
+      await dispatch(createFaq({ question: newQuestion, answer: newAnswer })).unwrap()
+      setNewQuestion("")
+      setNewAnswer("")
+      setCreateDialogOpen(false)
+      toast({
+        title: "FAQ Created",
+        description: "The FAQ has been successfully created.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string || "Failed to create FAQ",
+        variant: "destructive",
+      })
     }
-    
-    setFaqs([...faqs, newFaq])
-    setNewQuestion("")
-    setNewAnswer("")
-    setCreateDialogOpen(false)
-    
-    toast({
-      title: "FAQ Created",
-      description: "The FAQ has been successfully created.",
-    })
   }
 
-  const handleEditFaq = () => {
+  // Handle editing an existing FAQ
+  const handleEditFaq = async () => {
     if (!currentFaq) return
     
-    // Simulate API call
-    const updatedFaqs = faqs.map(faq => 
-      faq.id === currentFaq.id 
-        ? { ...faq, question: newQuestion, answer: newAnswer } 
-        : faq
-    )
-    
-    setFaqs(updatedFaqs)
-    setEditDialogOpen(false)
-    
-    toast({
-      title: "FAQ Updated",
-      description: "The FAQ has been successfully updated.",
-    })
+    try {
+      await dispatch(updateFaq({ 
+        faqId: currentFaq.id, 
+        question: newQuestion, 
+        answer: newAnswer 
+      })).unwrap()
+      setEditDialogOpen(false)
+      toast({
+        title: "FAQ Updated",
+        description: "The FAQ has been successfully updated.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string || "Failed to update FAQ",
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleDeleteFaq = () => {
+  // Handle deleting a FAQ
+  const handleDeleteFaq = async () => {
     if (!currentFaq) return
     
-    // Simulate API call
-    const updatedFaqs = faqs.filter(faq => faq.id !== currentFaq.id)
-    setFaqs(updatedFaqs)
-    setDeleteDialogOpen(false)
-    
-    toast({
-      title: "FAQ Deleted",
-      description: "The FAQ has been successfully deleted.",
-    })
+    try {
+      await dispatch(deleteFaq(currentFaq.id)).unwrap()
+      setDeleteDialogOpen(false)
+      toast({
+        title: "FAQ Deleted",
+        description: "The FAQ has been successfully deleted.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string || "Failed to delete FAQ",
+        variant: "destructive",
+      })
+    }
   }
 
+  // Open edit dialog with selected FAQ
   const openEditDialog = (faq: FAQ) => {
     setCurrentFaq(faq)
     setNewQuestion(faq.question)
@@ -154,6 +135,7 @@ export default function FAQManagement() {
     setEditDialogOpen(true)
   }
 
+  // Open delete dialog with selected FAQ
   const openDeleteDialog = (faq: FAQ) => {
     setCurrentFaq(faq)
     setDeleteDialogOpen(true)
@@ -167,6 +149,55 @@ export default function FAQManagement() {
           Manage frequently asked questions displayed to users.
         </p>
       </div>
+
+      {/* Statistics Cards */}
+      {faqStatistics && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-blue-600 font-medium">Total FAQs</p>
+                  <p className="text-2xl font-bold text-blue-700">{faqStatistics.total_faqs}</p>
+                </div>
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-green-200 bg-green-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-green-600 font-medium">Recent FAQs</p>
+                  <p className="text-2xl font-bold text-green-700">{faqStatistics.recent_faqs}</p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-full">
+                  <RefreshCw className="w-5 h-5 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-purple-600 font-medium">Latest FAQ</p>
+                  <p className="text-sm font-semibold text-purple-700 truncate">
+                    {faqStatistics.latest_faq.question}
+                  </p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-full">
+                  <Plus className="w-5 h-5 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Card className="mb-6 overflow-hidden border border-purple-100 shadow-md">
         <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-500 text-white py-4">
@@ -186,13 +217,24 @@ export default function FAQManagement() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add New FAQ
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => dispatch(fetchAllFaqs({}))}
+                disabled={loading.fetchAllFaqs}
+                className="h-10"
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading.fetchAllFaqs ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add New FAQ
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[550px]">
                 <DialogHeader>
                   <DialogTitle>Create New FAQ</DialogTitle>
@@ -226,16 +268,27 @@ export default function FAQManagement() {
                   <Button 
                     className="bg-purple-600 hover:bg-purple-700"
                     onClick={handleCreateFaq}
-                    disabled={!newQuestion.trim() || !newAnswer.trim()}
+                    disabled={!newQuestion.trim() || !newAnswer.trim() || loading.createFaq}
                   >
-                    Create FAQ
+                    {loading.createFaq ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create FAQ
+                      </>
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
-          {loading ? (
+          {loading.fetchAllFaqs ? (
             <div className="flex items-center justify-center py-10">
               <RefreshCw className="w-8 h-8 animate-spin text-purple-600" />
             </div>
@@ -294,6 +347,38 @@ export default function FAQManagement() {
               </Table>
             </div>
           )}
+          
+          {/* Pagination Info */}
+          {faqPagination && faqPagination.total > 0 && (
+            <div className="mt-4 flex items-center justify-between text-sm text-gray-600 border-t pt-4">
+              <div>
+                Showing {faqPagination.from} to {faqPagination.to} of {faqPagination.total} FAQs
+              </div>
+              <div className="flex items-center gap-2">
+                <span>Page {faqPagination.current_page} of {faqPagination.last_page}</span>
+                {faqPagination.last_page > 1 && (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => dispatch(fetchAllFaqs({ page: faqPagination.current_page - 1 }))}
+                      disabled={faqPagination.current_page === 1 || loading.fetchAllFaqs}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => dispatch(fetchAllFaqs({ page: faqPagination.current_page + 1 }))}
+                      disabled={faqPagination.current_page === faqPagination.last_page || loading.fetchAllFaqs}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -332,9 +417,19 @@ export default function FAQManagement() {
             <Button 
               className="bg-blue-600 hover:bg-blue-700"
               onClick={handleEditFaq}
-              disabled={!newQuestion.trim() || !newAnswer.trim()}
+              disabled={!newQuestion.trim() || !newAnswer.trim() || loading.updateFaq}
             >
-              Update FAQ
+              {loading.updateFaq ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Update FAQ
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -359,8 +454,19 @@ export default function FAQManagement() {
             <Button 
               variant="destructive"
               onClick={handleDeleteFaq}
+              disabled={loading.deleteFaq}
             >
-              Delete FAQ
+              {loading.deleteFaq ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete FAQ
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -19,6 +19,9 @@ import {
   GetAllUsersParams,
   GetAllPostsParams,
   UpdateAdminPasswordPayload,
+  GetAllFaqsParams,
+  CreateFaqPayload,
+  UpdateFaqPayload,
 } from '../types/admin';
 import * as adminService from '../services/adminService';
 
@@ -453,6 +456,105 @@ export const updateAdminPassword = createAsyncThunk(
       const apiError = error as ApiError;
       console.error('❌ [Admin] Error updating admin password:', apiError);
       return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to update admin password');
+    }
+  }
+);
+
+// ============================================================================
+// ASYNC THUNKS - FAQ MANAGEMENT
+// ============================================================================
+
+/**
+ * Get all FAQs with pagination and filtering
+ */
+export const fetchAllFaqs = createAsyncThunk(
+  'admin/fetchAllFaqs',
+  async (params: GetAllFaqsParams = {}, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Fetching all FAQs...', params);
+      const response = await adminService.getAllFaqs(params);
+      console.log('✅ [Admin] All FAQs fetched successfully:', response);
+      return response;
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error fetching all FAQs:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to fetch FAQs');
+    }
+  }
+);
+
+/**
+ * Create a new FAQ
+ */
+export const createFaq = createAsyncThunk(
+  'admin/createFaq',
+  async (payload: CreateFaqPayload, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Creating FAQ...', payload);
+      const response = await adminService.createFaq(payload);
+      console.log('✅ [Admin] FAQ created successfully:', response);
+      return response;
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error creating FAQ:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to create FAQ');
+    }
+  }
+);
+
+/**
+ * Update an existing FAQ
+ */
+export const updateFaq = createAsyncThunk(
+  'admin/updateFaq',
+  async (payload: UpdateFaqPayload, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Updating FAQ...', payload);
+      const response = await adminService.updateFaq(payload);
+      console.log('✅ [Admin] FAQ updated successfully:', response);
+      return response;
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error updating FAQ:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to update FAQ');
+    }
+  }
+);
+
+/**
+ * Delete a FAQ
+ */
+export const deleteFaq = createAsyncThunk(
+  'admin/deleteFaq',
+  async (faqId: number, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Deleting FAQ...', faqId);
+      const response = await adminService.deleteFaq(faqId);
+      console.log('✅ [Admin] FAQ deleted successfully:', response);
+      return { faqId, response };
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error deleting FAQ:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to delete FAQ');
+    }
+  }
+);
+
+/**
+ * Get FAQ statistics
+ */
+export const fetchFaqStatistics = createAsyncThunk(
+  'admin/fetchFaqStatistics',
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log('🔄 [Admin] Fetching FAQ statistics...');
+      const response = await adminService.getFaqStatistics();
+      console.log('✅ [Admin] FAQ statistics fetched successfully:', response);
+      return response;
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      console.error('❌ [Admin] Error fetching FAQ statistics:', apiError);
+      return rejectWithValue(apiError.response?.data?.message || apiError.message || 'Failed to fetch FAQ statistics');
     }
   }
 );
@@ -965,6 +1067,104 @@ const adminSlice = createSlice({
       })
       .addCase(updateAdminPassword.rejected, (state, action) => {
         state.loading.updatePassword = false;
+        state.error = action.payload as string;
+      })
+
+    // ========================================================================
+    // FAQ MANAGEMENT
+    // ========================================================================
+      .addCase(fetchAllFaqs.pending, (state) => {
+        state.loading.fetchAllFaqs = true;
+        state.error = null;
+      })
+      .addCase(fetchAllFaqs.fulfilled, (state, action) => {
+        state.loading.fetchAllFaqs = false;
+        state.faqs = action.payload.data.data;
+        state.faqPagination = {
+          current_page: action.payload.data.current_page,
+          last_page: action.payload.data.last_page,
+          per_page: action.payload.data.per_page,
+          total: action.payload.data.total,
+          from: action.payload.data.from,
+          to: action.payload.data.to,
+        };
+        if (action.payload.meta?.stats) {
+          state.faqStatistics = action.payload.meta.stats;
+        }
+        state.error = null;
+      })
+      .addCase(fetchAllFaqs.rejected, (state, action) => {
+        state.loading.fetchAllFaqs = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(createFaq.pending, (state) => {
+        state.loading.createFaq = true;
+        state.error = null;
+      })
+      .addCase(createFaq.fulfilled, (state, action) => {
+        state.loading.createFaq = false;
+        // Add the new FAQ to the beginning of the list
+        state.faqs.unshift(action.payload.data);
+        // Update pagination total if available
+        if (state.faqPagination) {
+          state.faqPagination.total += 1;
+        }
+        state.error = null;
+      })
+      .addCase(createFaq.rejected, (state, action) => {
+        state.loading.createFaq = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(updateFaq.pending, (state) => {
+        state.loading.updateFaq = true;
+        state.error = null;
+      })
+      .addCase(updateFaq.fulfilled, (state, action) => {
+        state.loading.updateFaq = false;
+        // Update the FAQ in the list
+        const faqIndex = state.faqs.findIndex(faq => faq.id === action.payload.data.id);
+        if (faqIndex !== -1) {
+          state.faqs[faqIndex] = action.payload.data;
+        }
+        state.error = null;
+      })
+      .addCase(updateFaq.rejected, (state, action) => {
+        state.loading.updateFaq = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(deleteFaq.pending, (state) => {
+        state.loading.deleteFaq = true;
+        state.error = null;
+      })
+      .addCase(deleteFaq.fulfilled, (state, action) => {
+        state.loading.deleteFaq = false;
+        // Remove the FAQ from the list
+        state.faqs = state.faqs.filter(faq => faq.id !== action.payload.faqId);
+        // Update pagination total if available
+        if (state.faqPagination) {
+          state.faqPagination.total -= 1;
+        }
+        state.error = null;
+      })
+      .addCase(deleteFaq.rejected, (state, action) => {
+        state.loading.deleteFaq = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(fetchFaqStatistics.pending, (state) => {
+        state.loading.fetchFaqStatistics = true;
+        state.error = null;
+      })
+      .addCase(fetchFaqStatistics.fulfilled, (state, action) => {
+        state.loading.fetchFaqStatistics = false;
+        state.faqStatistics = action.payload.data;
+        state.error = null;
+      })
+      .addCase(fetchFaqStatistics.rejected, (state, action) => {
+        state.loading.fetchFaqStatistics = false;
         state.error = action.payload as string;
       });
   },
