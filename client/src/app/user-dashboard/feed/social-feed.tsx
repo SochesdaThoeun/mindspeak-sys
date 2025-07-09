@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, ImageIcon, LinkIcon, Smile, Hash, Trash2, X, Loader2 } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, ImageIcon, LinkIcon, Smile, Hash, Trash2, X, Loader2, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import logo8 from "@/assets/logo8.png"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Progress } from "@/components/ui/progress"
 
 // Redux imports
 import { usePosts, useComments, useAppDispatch } from "@/store/hooks"
@@ -88,6 +90,82 @@ export default function SocialFeed() {
   const [commentError] = useState<Record<number, string>>({})
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Validation states
+  const [isValidationOpen, setIsValidationOpen] = useState(false)
+  const [validationState, setValidationState] = useState({
+    title: { valid: false, message: "" },
+    content: { valid: false, message: "" },
+    image: { valid: true, message: "" }
+  })
+
+  // Function to validate title
+  const validateTitle = (title: string) => {
+    if (title.length < 5) {
+      return { valid: false, message: "Title must be at least 5 characters" }
+    }
+    if (title.length > 255) {
+      return { valid: false, message: "Title must be less than 255 characters" }
+    }
+    return { valid: true, message: "" }
+  }
+
+  // Function to validate content
+  const validateContent = (content: string) => {
+    if (content.length < 10) {
+      return { valid: false, message: "Content must be at least 10 characters" }
+    }
+    if (content.length > 5000) {
+      return { valid: false, message: "Content must be less than 5000 characters" }
+    }
+    return { valid: true, message: "" }
+  }
+
+  // Function to validate image size
+  const validateImage = (file: File | null) => {
+    if (!file) return { valid: true, message: "" }
+    const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+    if (file.size > maxSize) {
+      return { valid: false, message: "Image must be less than 5MB" }
+    }
+    return { valid: true, message: "" }
+  }
+
+  // Update validation state when inputs change
+  useEffect(() => {
+    setValidationState({
+      title: validateTitle(newPostTitle),
+      content: validateContent(newPostText),
+      image: validateImage(selectedImage)
+    })
+  }, [newPostTitle, newPostText, selectedImage])
+
+  // Handle image change with validation
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const imageValidation = validateImage(file)
+      if (!imageValidation.valid) {
+        setValidationState(prev => ({
+          ...prev,
+          image: imageValidation
+        }))
+        return
+      }
+      setSelectedImage(file)
+      const reader = new FileReader()
+      reader.onload = () => setImagePreview(reader.result as string)
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Check if post button should be enabled
+  const isPostButtonEnabled = () => {
+    return validationState.title.valid && 
+           validationState.content.valid && 
+           validationState.image.valid &&
+           !isCreating
+  }
 
   // Load initial posts on component mount
   useEffect(() => {
@@ -206,16 +284,6 @@ export default function SocialFeed() {
       }
     }
   }, [])
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSelectedImage(file)
-      const reader = new FileReader()
-      reader.onload = () => setImagePreview(reader.result as string)
-      reader.readAsDataURL(file)
-    }
-  }
 
   const removeImage = () => {
     setSelectedImage(null)
@@ -627,6 +695,96 @@ export default function SocialFeed() {
         </Card>
       )}
 
+      {/* Validation Banner */}
+      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+        <Collapsible
+          open={isValidationOpen}
+          onOpenChange={setIsValidationOpen}
+          className="w-full"
+        >
+          <div className="p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-blue-500" />
+              <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                Post Requirements
+              </h3>
+            </div>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-9 p-0">
+                {isValidationOpen ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+
+          <CollapsibleContent>
+            <div className="px-4 pb-4 space-y-3">
+              {/* Title Validation */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label className={cn(
+                    "text-sm",
+                    validationState.title.valid ? "text-green-600" : "text-gray-600"
+                  )}>
+                    Title ({newPostTitle.length}/255)
+                  </Label>
+                  {validationState.title.message && (
+                    <span className="text-xs text-red-500">{validationState.title.message}</span>
+                  )}
+                </div>
+                <Progress 
+                  value={(newPostTitle.length / 255) * 100} 
+                  className="h-1"
+                />
+              </div>
+
+              {/* Content Validation */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <Label className={cn(
+                    "text-sm",
+                    validationState.content.valid ? "text-green-600" : "text-gray-600"
+                  )}>
+                    Content ({newPostText.length}/5000)
+                  </Label>
+                  {validationState.content.message && (
+                    <span className="text-xs text-red-500">{validationState.content.message}</span>
+                  )}
+                </div>
+                <Progress 
+                  value={(newPostText.length / 5000) * 100} 
+                  className="h-1"
+                />
+              </div>
+
+              {/* Image Validation */}
+              {selectedImage && (
+                <div>
+                  <div className="flex justify-between items-center">
+                    <Label className={cn(
+                      "text-sm",
+                      validationState.image.valid ? "text-green-600" : "text-gray-600"
+                    )}>
+                      Image Size ({(selectedImage.size / (1024 * 1024)).toFixed(2)}MB/5MB)
+                    </Label>
+                    {validationState.image.message && (
+                      <span className="text-xs text-red-500">{validationState.image.message}</span>
+                    )}
+                  </div>
+                  <Progress 
+                    value={(selectedImage.size / (5 * 1024 * 1024)) * 100} 
+                    className="h-1"
+                  />
+                </div>
+              )}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </Card>
+
       {/* Create Post */}
       <Card className="shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
         <CardContent className="p-4">
@@ -809,7 +967,7 @@ export default function SocialFeed() {
               className="bg-[#1d2b7d] hover:bg-[#1d2b7d]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               size="sm"
               onClick={handleNewPost}
-              disabled={(!newPostText.trim() && !imagePreview && !selectedLink) || isCreating}
+              disabled={!isPostButtonEnabled()}
             >
               {isCreating ? (
                 <>

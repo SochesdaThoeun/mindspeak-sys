@@ -27,9 +27,11 @@ export function RejectionReasonModal({
   isLoading
 }: RejectionReasonModalProps) {
   const [reason, setReason] = useState("");
+  const MIN_CHARS = 10;
+  const isValid = reason.trim().length >= MIN_CHARS;
 
   const handleSubmit = async () => {
-    if (!reason.trim()) {
+    if (!isValid) {
       return;
     }
 
@@ -71,12 +73,20 @@ export function RejectionReasonModal({
             </Alert>
           )}
 
-          <Textarea
-            placeholder="Enter admin note for rejection..."
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="min-h-[100px]"
-          />
+          <div className="space-y-2">
+            <Textarea
+              placeholder="Enter admin note for rejection..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <Alert variant={isValid ? "default" : "destructive"} className="h-10">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {reason.trim().length} / {MIN_CHARS} characters minimum
+              </AlertDescription>
+            </Alert>
+          </div>
         </div>
 
         <DialogFooter className="sm:justify-end">
@@ -92,7 +102,7 @@ export function RejectionReasonModal({
             type="button"
             variant="destructive"
             onClick={handleSubmit}
-            disabled={!reason.trim() || isLoading}
+            disabled={!isValid || isLoading}
           >
             {isLoading ? (
               <>

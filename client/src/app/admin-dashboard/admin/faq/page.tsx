@@ -8,7 +8,9 @@ import {
   Plus,
   RefreshCw,
   AlertTriangle,
-  BookOpen
+  BookOpen,
+  X,
+  Info
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,7 +29,7 @@ import {
 } from "@/components/ui/table"
 import { DialogFooter } from "@/components/ui/dialog"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { fetchAllFaqs, createFaq, updateFaq, deleteFaq } from "@/store/slices/adminSlice"
+import { fetchAllFaqs, createFaq, updateFaq, deleteFaq, clearError } from "@/store/slices/adminSlice"
 import { FAQ } from "@/store/types/faq"
 
 export default function FAQManagement() {
@@ -35,11 +37,12 @@ export default function FAQManagement() {
   const dispatch = useAppDispatch()
   
   // Redux state
-  const { faqs, loading, faqPagination, faqStatistics } = useAppSelector((state) => ({
+  const { faqs, loading, faqPagination, faqStatistics, error } = useAppSelector((state) => ({
     faqs: state.admin.faqs,
     loading: state.admin.loading,
     faqPagination: state.admin.faqPagination,
-    faqStatistics: state.admin.faqStatistics
+    faqStatistics: state.admin.faqStatistics,
+    error: state.admin.error
   }))
 
   // Local state
@@ -74,12 +77,25 @@ export default function FAQManagement() {
         title: "FAQ Created",
         description: "The FAQ has been successfully created.",
       })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error as string || "Failed to create FAQ",
-        variant: "destructive",
-      })
+    } catch (error: unknown) {
+      console.error('Create FAQ Error:', error)
+      // Check if it's a validation error
+      const err = error as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (err?.response?.data?.errors) {
+        const validationErrors = err.response.data.errors
+        const errorMessages = Object.values(validationErrors).flat().join(', ')
+        toast({
+          title: "Validation Error",
+          description: errorMessages,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: error as string || "Failed to create FAQ",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -98,12 +114,25 @@ export default function FAQManagement() {
         title: "FAQ Updated",
         description: "The FAQ has been successfully updated.",
       })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error as string || "Failed to update FAQ",
-        variant: "destructive",
-      })
+    } catch (error: unknown) {
+      console.error('Update FAQ Error:', error)
+      // Check if it's a validation error
+      const err = error as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (err?.response?.data?.errors) {
+        const validationErrors = err.response.data.errors
+        const errorMessages = Object.values(validationErrors).flat().join(', ')
+        toast({
+          title: "Validation Error",
+          description: errorMessages,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: error as string || "Failed to update FAQ",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -199,6 +228,31 @@ export default function FAQManagement() {
         </div>
       )}
 
+      {/* Error Banner */}
+      {error && (
+        <Card className="mb-6 border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-red-800">Error</h4>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => dispatch(clearError())}
+                className="text-red-600 hover:text-red-800 hover:bg-red-100 p-1 h-auto"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="mb-6 overflow-hidden border border-purple-100 shadow-md">
         <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-500 text-white py-4">
           <CardTitle className="flex items-center gap-2">
@@ -230,7 +284,7 @@ export default function FAQManagement() {
               </Button>
               <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-purple-600 hover:bg-purple-700">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                     <Plus className="mr-2 h-4 w-4" />
                     Add New FAQ
                   </Button>
@@ -250,6 +304,12 @@ export default function FAQManagement() {
                       value={newQuestion}
                       onChange={(e) => setNewQuestion(e.target.value)}
                     />
+                    <div className="flex justify-between text-xs">
+                      <span className={`${newQuestion.trim().length < 10 ? 'text-red-500' : 'text-green-600'}`}>
+                        {newQuestion.trim().length}/10 characters
+                      </span>
+                      <span className="text-gray-500">Minimum 10 characters required</span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Answer</label>
@@ -259,6 +319,26 @@ export default function FAQManagement() {
                       value={newAnswer}
                       onChange={(e) => setNewAnswer(e.target.value)}
                     />
+                    <div className="flex justify-between text-xs">
+                      <span className={`${newAnswer.trim().length < 20 ? 'text-red-500' : 'text-green-600'}`}>
+                        {newAnswer.trim().length}/20 characters
+                      </span>
+                      <span className="text-gray-500">Minimum 20 characters required</span>
+                    </div>
+                  </div>
+                  
+                  {/* Validation Helper */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm">
+                        <p className="font-medium text-blue-800">Validation Requirements:</p>
+                        <ul className="mt-1 text-blue-700 space-y-1">
+                          <li>• Question must be at least 10 characters long</li>
+                          <li>• Answer must be at least 20 characters long</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <DialogFooter className="mt-6">
@@ -266,9 +346,15 @@ export default function FAQManagement() {
                     Cancel
                   </Button>
                   <Button 
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-purple-600 hover:bg-purple-700  text-white"
                     onClick={handleCreateFaq}
-                    disabled={!newQuestion.trim() || !newAnswer.trim() || loading.createFaq}
+                    disabled={
+                      !newQuestion.trim() || 
+                      !newAnswer.trim() || 
+                      newQuestion.trim().length < 10 || 
+                      newAnswer.trim().length < 20 || 
+                      loading.createFaq
+                    }
                   >
                     {loading.createFaq ? (
                       <>
@@ -399,6 +485,12 @@ export default function FAQManagement() {
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
               />
+              <div className="flex justify-between text-xs">
+                <span className={`${newQuestion.trim().length < 10 ? 'text-red-500' : 'text-green-600'}`}>
+                  {newQuestion.trim().length}/10 characters
+                </span>
+                <span className="text-gray-500">Minimum 10 characters required</span>
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Answer</label>
@@ -408,6 +500,26 @@ export default function FAQManagement() {
                 value={newAnswer}
                 onChange={(e) => setNewAnswer(e.target.value)}
               />
+              <div className="flex justify-between text-xs">
+                <span className={`${newAnswer.trim().length < 20 ? 'text-red-500' : 'text-green-600'}`}>
+                  {newAnswer.trim().length}/20 characters
+                </span>
+                <span className="text-gray-500">Minimum 20 characters required</span>
+              </div>
+            </div>
+            
+            {/* Validation Helper */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-800">Validation Requirements:</p>
+                  <ul className="mt-1 text-blue-700 space-y-1">
+                    <li>• Question must be at least 10 characters long</li>
+                    <li>• Answer must be at least 20 characters long</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter className="mt-6">
@@ -415,9 +527,15 @@ export default function FAQManagement() {
               Cancel
             </Button>
             <Button 
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700  text-white"
               onClick={handleEditFaq}
-              disabled={!newQuestion.trim() || !newAnswer.trim() || loading.updateFaq}
+              disabled={
+                !newQuestion.trim() || 
+                !newAnswer.trim() || 
+                newQuestion.trim().length < 10 || 
+                newAnswer.trim().length < 20 || 
+                loading.updateFaq
+              }
             >
               {loading.updateFaq ? (
                 <>
